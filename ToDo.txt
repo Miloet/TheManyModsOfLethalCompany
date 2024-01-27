@@ -1,0 +1,15 @@
+Find best way to activate the three functions of the market device
+	Next stock - ItemActivate()
+	Buy stock - ItemInteractLeftRight() [Left/Q]
+	Sell stock - ItemInteractLeftRight() [Right/E]
+
+
+
+implement allready made stock market sim
+
+update the stock once per second
+Update stock with next day after 
+
+make the static stocks:
+	1. save in the file (maybe does automatically)
+	2. same across all the computers
