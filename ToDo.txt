@@ -13,3 +13,132 @@ Update stock with next day after
 make the static stocks:
 	1. save in the file (maybe does automatically)
 	2. same across all the computers
+
+Do whatever this is... dont quite know what i means but find out and do it.		
+Make sure that there is a .pdb file when you build your plugin. If it is not there, make sure that Debug Symbols is set to Portable and not embedded.
+
+Follow:
+1. Right-click on your project in Visual Studio Solution Explorer.
+2. Select "Properties" from the context menu.
+3. Go to the "Build Events" tab.
+4. In the "Post-build event command line" textbox, you can paste the provided commands.
+
+cd <NetcodePatcher Folder Directory Here>
+NetcodePatcher.dll $(TargetDir) deps/
+
+Make stocks unable to be traded when a level isnt loaded AND the time is between 9:30 and 16:00 
+
+using System;
+using Unity.Netcode;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+namespace LC_StockIndex;
+
+public class MellowdyNetworkHandler : NetworkBehaviour
+{
+	public static event Action<int, int> StockValue;
+	[ClientRpc]
+	UpdateStockClientRpc(int id, int newValue)
+	{
+		StockValue?.Invoke(id, newValue);
+	}
+
+	public override void OnNetworkSpawn()
+	{
+		StockValue = null;
+
+		if (NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsServer) 
+        	Instance?.gameObject.GetComponent<NetworkObject>().Despawn(); 
+    	Instance = this; 
+
+		base.OnNetworkSpawn();
+	}
+
+    public static MellowdyNetworkHandler Instance { get; private set; }
+}
+
+[IN A NEW PATCH]
+
+[HarmonyPatch]
+public class NetworkObjectManager
+{
+    [HarmonyPostfix, HarmonyPatch(typeof(GameNetworkManager), nameof(GameNetworkManager.Start))]
+    public static void Init()
+    {
+        if (networkPrefab != null)
+            return;
+        
+        networkPrefab = (GameObject)MainAssetBundle.LoadAsset("ExampleNetworkHandler");
+		networkPrefab.AddComponent<MellowdyNetworkHandler>(); 
+
+		NetworkManager.Singleton.AddNetworkPrefab(networkPrefab); 
+    }
+
+	[HarmonyPostfix, HarmonyPatch(typeof(StartOfRound), nameof(StartOfRound.Awake))]
+	static void SpawnNetworkHandler()
+	{
+		if(NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsServer) 
+		{
+			var networkHandlerHost = Object.Instantiate(networkPrefab, Vector3.zero, Quaternion.identity)
+			networkHandlerHost.GetComponent<NetworkObject>().Spawn();
+		}
+	}
+
+    static GameObject networkPrefab;
+
+
+
+
+	[HarmonyPostfix, HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
+	static void SubscribeToHandler()
+	{
+		ExampleNetworkHandler.LevelEvent += ReceivedEventFromServer;
+	}
+
+	[HarmonyPostfix, HarmonyPatch(typeof(RoundManager), nameof(RoundManager.DespawnPropsAtEndOfRound))]
+	static void UnsubscribeFromHandler()
+	{
+		ExampleNetworkHandler.LevelEvent -= ReceivedEventFromServer;
+	}
+
+	static void ReceivedEventFromServer(int id, int newValue)
+	{
+		StockIndex.stocks[id].value = newValue;
+	}
+
+	static void SendEventToClients(int id, int newValue)
+	{
+		if (!(NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsServer))
+			return;
+
+		MellowdyNetworkHandler.Instance.UpdateStockClientRpc(id, newValue);
+	}
+}
+
+
+
+
+Add to Plugin.cs 
+
+private static void NetcodePatcher()
+{
+    var types = Assembly.GetExecutingAssembly().GetTypes();
+    foreach (var type in types)
+    {
+        var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+        foreach (var method in methods)
+        {
+            var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
+            if (attributes.Length > 0)
+            {
+                method.Invoke(null, null);
+            }
+        }
+    }
+}
+
+static void Awake() //In its awake
+{
+    NetcodePatcher(); // ONLY RUN ONCE
+}
