@@ -41,6 +41,8 @@ namespace LC_StockMarketIndex
 
         static float size = 4f;
 
+        public static string[] Companies = {"Apple","Haldan Electronics","FacePunch","The Company", "Kremmer's crematorium", "Zeekers"}; 
+
 
         void Awake()
         {

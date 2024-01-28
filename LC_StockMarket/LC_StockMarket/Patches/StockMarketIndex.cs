@@ -4,26 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using SAM;
 using UnityEngine.SceneManagement;
 using GameNetcodeStuff;
 
+
 namespace LC_StockMarketIndex.Patches
 {
     public class StockMarketIndex : GrabbableObject
     {
+        //Stocks
+        public static Stock[] stocks;
+
         public AudioSource audioSource;
         public TextMeshPro stockText;
         public PlayerControllerB previousPlayerHeldBy;
-
-        int num;
 
         public static Terminal terminal;
 
         public override void Start()
         {
             base.Start();
+
+
 
             //Assure correct spawning
 
@@ -38,9 +43,9 @@ namespace LC_StockMarketIndex.Patches
             mainObjectRenderer = GetComponent<MeshRenderer>();
             audioSource = GetComponent<AudioSource>();
             stockText = GetComponentInChildren<TextMeshPro>();
-            if(terminal == null) terminal = FindObjectOfType<Terminal>();
+            if (terminal == null) terminal = FindObjectOfType<Terminal>();
 
-            UpdateText();
+                UpdateText();
         }
         public static void FindTerminal(Scene scene, LoadSceneMode mode)
         {
@@ -76,7 +81,7 @@ namespace LC_StockMarketIndex.Patches
         }
         public void SellStock()
         {
-            num--;
+
             PlaySAM.SayString("You gained 5$, Big W", audioSource);
             terminal.groupCredits = Mathf.Max(terminal.groupCredits + 5, 0);
             terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
@@ -85,7 +90,7 @@ namespace LC_StockMarketIndex.Patches
         }
         public void BuyStock()
         {
-            num++;
+
             PlaySAM.SayString("You Lost 5$, L bozo", audioSource);
             terminal.groupCredits = Mathf.Max(terminal.groupCredits - 5, 0);
             terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
@@ -95,7 +100,7 @@ namespace LC_StockMarketIndex.Patches
 
         public void UpdateText()
         {
-            stockText.text = num.ToString() + "   " + terminal.groupCredits + "   " + previousPlayerHeldBy.equippedUsableItemQE.ToString();
+            stockText.text = "   " + terminal.groupCredits + "   " + previousPlayerHeldBy.equippedUsableItemQE.ToString();
         }
 
         public override void EquipItem()

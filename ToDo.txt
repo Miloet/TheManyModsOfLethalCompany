@@ -1,11 +1,5 @@
-Find best way to activate the three functions of the market device
-	Next stock - ItemActivate()
-	Buy stock - ItemInteractLeftRight() [Left/Q]
-	Sell stock - ItemInteractLeftRight() [Right/E]
-
-
-
-implement allready made stock market sim
+implement saving the stock data OR simply sell all stocks at the end of session
+implement already made stock market sim
 
 update the stock once per second
 Update stock with next day after 
@@ -17,6 +11,8 @@ make the static stocks:
 Do whatever this is... dont quite know what i means but find out and do it.		
 Make sure that there is a .pdb file when you build your plugin. If it is not there, make sure that Debug Symbols is set to Portable and not embedded.
 
+
+
 Follow:
 1. Right-click on your project in Visual Studio Solution Explorer.
 2. Select "Properties" from the context menu.
@@ -27,6 +23,8 @@ cd <NetcodePatcher Folder Directory Here>
 NetcodePatcher.dll $(TargetDir) deps/
 
 Make stocks unable to be traded when a level isnt loaded AND the time is between 9:30 and 16:00 
+
+Add terminal entries for the different companies using TerminalAPI
 
 using System;
 using Unity.Netcode;
