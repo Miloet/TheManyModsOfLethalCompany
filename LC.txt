@@ -37,3 +37,6 @@ Electric Emergency stim shot (EESS) (equipment)
 Portable Stock market
 		Terminal.groupCredits = newCreditAmount;
 		Terminal.SyncGroupCreditsClientRpc(newCreditAmount,Terminal.numItemsInShip);
+
+
+Comically large E-Pill bottle (high value scrap)

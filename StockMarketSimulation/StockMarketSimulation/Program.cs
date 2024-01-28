@@ -12,6 +12,11 @@ internal class Program
 {
     static void Main()
     {
+        int atk = 10;
+        int def = 10;
+        int level = -4;
+        Console.WriteLine(((2 * level / 5) + 2) * 50 * atk / def / 50 + 2);
+
         Stock[] stockMarket = {
         new Stock("Control LLC",840,0.5f,1.1f),
         new Stock("Hal Inc",120,.05f,1.05f),
