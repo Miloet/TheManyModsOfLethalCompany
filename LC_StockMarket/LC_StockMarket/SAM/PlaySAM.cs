@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using SAM;
+using LC_StockMarketIndex;
 
 
 namespace SAM
@@ -9,6 +10,9 @@ namespace SAM
 	{
 		public static void SayString(string s, AudioSource source)
 		{
+			if (!StockMarketIndexMod.voice.Value) return;
+
+
 			StopAudio(source);
 
 			// HACK!

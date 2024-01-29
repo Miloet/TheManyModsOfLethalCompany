@@ -9,6 +9,7 @@ using TMPro;
 using SAM;
 using UnityEngine.SceneManagement;
 using GameNetcodeStuff;
+using Unity.Netcode;
 
 
 namespace LC_StockMarketIndex.Patches
@@ -16,6 +17,8 @@ namespace LC_StockMarketIndex.Patches
     public class StockMarketIndex : GrabbableObject
     {
         //Stocks
+
+        public int id;
         public static Stock[] stocks;
 
         public AudioSource audioSource;
@@ -23,6 +26,8 @@ namespace LC_StockMarketIndex.Patches
         public PlayerControllerB previousPlayerHeldBy;
 
         public static Terminal terminal;
+
+        static float updateTime = 0;
 
         public override void Start()
         {
@@ -58,7 +63,21 @@ namespace LC_StockMarketIndex.Patches
         {
             base.Update();
 
+            if (NetworkObjectManager.GetIsHostOrServer())
+            {
 
+                if (updateTime <= 0)
+                {
+                    for (int i = 0; i < stocks.Length; i++)
+                    {
+                        int change = stocks[i].GetCurrentValue();
+                        stocks[i].UpdatePrice(Time.time);
+                        if (change != stocks[i].GetCurrentValue()) NetworkObjectManager.SendValueToClients(i, stocks[i].GetCurrentValue());
+                    }
+                    updateTime = 1;
+                }
+                else updateTime -= Time.deltaTime;
+            }
         }
 
         public override void ItemInteractLeftRight(bool right)
@@ -81,26 +100,42 @@ namespace LC_StockMarketIndex.Patches
         }
         public void SellStock()
         {
-
-            PlaySAM.SayString("You gained 5$, Big W", audioSource);
-            terminal.groupCredits = Mathf.Max(terminal.groupCredits + 5, 0);
-            terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
-
+            if (stocks[id].owned > 0)
+            {
+                stocks[id].owned--;
+                terminal.groupCredits += stocks[id].GetCurrentValue();
+                terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
+                //Do server call to update the stocks owned value
+                NetworkObjectManager.SendOwnedToClients(id, stocks[id].owned);
+            }
+            else
+            {
+                PlaySAM.SayString($"You do not own any shares in {stocks[id].name}. L bozo", audioSource);
+            }
             UpdateText();
         }
         public void BuyStock()
         {
-
-            PlaySAM.SayString("You Lost 5$, L bozo", audioSource);
-            terminal.groupCredits = Mathf.Max(terminal.groupCredits - 5, 0);
-            terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
-
+            if (stocks[id].GetCurrentValue() <= terminal.groupCredits)
+            {
+                stocks[id].owned++;
+                terminal.groupCredits -= stocks[id].GetCurrentValue();
+                terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
+                //Do server call to update the stocks owned value
+                NetworkObjectManager.SendOwnedToClients(id, stocks[id].owned);
+            }
+            else
+            {
+                PlaySAM.SayString($"You are too broke to buy {stocks[id].name}. Broke bitch", audioSource);
+            }
             UpdateText();
         }
 
         public void UpdateText()
         {
-            stockText.text = "   " + terminal.groupCredits + "   " + previousPlayerHeldBy.equippedUsableItemQE.ToString();
+            string color = stocks[id].GetDailyGrowth() > 0 ? "green" : "red";
+
+            stockText.text = $"{stocks[id].name}  {stocks[id].GetCurrentValue()}$  <color={color}>{stocks[id].WriteDailyGrowth()}</color>  ({stocks[id].owned})"   +"   " + terminal.groupCredits;
         }
 
         public override void EquipItem()

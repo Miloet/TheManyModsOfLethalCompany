@@ -34,15 +34,17 @@ namespace LC_StockMarketIndex
         static string Description = "Allows you to buy and sell speculative assets.";
 
         static ConfigEntry<int> price;
-        static ConfigEntry<bool> voice;
+        public static ConfigEntry<bool> voice;
 
         static Vector3 positionInHand = new Vector3(-0.08f, -0.05f, 0.07f);
         static Vector3 rotationInHand = new Vector3(-165, -75f, 0);
 
         static float size = 4f;
 
-        public static string[] Companies = {"Apple","Haldan Electronics","FacePunch","The Company", "Kremmer's crematorium", "Zeekers"}; 
+        public static string[] Companies = {"Apple","Haldan Electronics","FacePunch","The Company", "Kremmer's crematorium", "Zeekers"};
 
+
+        public static GameObject networkObject;
 
         void Awake()
         {
@@ -66,6 +68,8 @@ namespace LC_StockMarketIndex
             mls.LogMessage(path);
 
             AssetBundle assets = AssetBundle.LoadFromFile(path);
+
+            networkObject = assets.LoadAsset<GameObject>("networkObject");
 
             Item device = ScriptableObject.CreateInstance<Item>();
 

@@ -31,7 +31,7 @@ using Unity.Netcode;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace LC_StockIndex;
+namespace LC_StockMarketIndex;
 
 public class MellowdyNetworkHandler : NetworkBehaviour
 {

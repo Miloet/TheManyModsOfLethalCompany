@@ -78,6 +78,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MellowdyNetworkHandler.cs" />
+    <Compile Include="Patches\NetworkManagerPatch.cs" />
     <Compile Include="Patches\StartGamePatch.cs" />
     <Compile Include="Stock.cs" />
     <Compile Include="Patches\StockMarketIndex.cs" />

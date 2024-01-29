@@ -22,6 +22,9 @@ namespace LC_StockMarketIndex.Patches
         static int lowGrowthDays = 4;
         public static int currentDay = 0;
 
+        public float tOffset;
+        public float tMult;
+
         public struct StockType
         {
             public float value;
