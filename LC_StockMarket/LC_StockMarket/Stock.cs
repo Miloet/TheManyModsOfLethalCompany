@@ -160,7 +160,7 @@ namespace LC_StockMarketIndex.Patches
         }
         public string WriteValue()
         {
-            return $"{GetCurrentValue()}$";
+            return $"{(int)Mathf.Ceil(value * owned)}$";
         }
         public int GetCurrentValue()
         {

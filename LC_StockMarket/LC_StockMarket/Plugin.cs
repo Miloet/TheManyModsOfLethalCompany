@@ -10,6 +10,7 @@ using Unity.Netcode;
 using LC_StockMarketIndex.Patches;
 using UnityEngine.SceneManagement;
 using SAM;
+using System.Reflection;
 
 namespace LC_StockMarketIndex
 {
@@ -52,24 +53,23 @@ namespace LC_StockMarketIndex
 
             mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
 
-            harmony.PatchAll(typeof(StockMarketIndexMod));
-
+            harmony.PatchAll();
 
             //Assign Config Settings
 
-            price = Config.Bind<int>("Price", "DevicePrice", 80, "Credits needed to buy the hand-held device");
+            price = Config.Bind<int>("Price", "DevicePrice", 35, "Credits needed to buy the hand-held device");
             voice = Config.Bind<bool>("Voice", "DeviceVoiceOn", true, "If the device talkt to you or not.");
 
             //Asset Bundle
 
-            string currentDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string path = Path.Combine(currentDirectory, assetName).Replace("\\", "/");
 
             mls.LogMessage(path);
 
             AssetBundle assets = AssetBundle.LoadFromFile(path);
 
-            networkObject = assets.LoadAsset<GameObject>("networkObject");
+            
 
             Item device = ScriptableObject.CreateInstance<Item>();
 
@@ -128,11 +128,13 @@ namespace LC_StockMarketIndex
             SceneManager.sceneLoaded += StockMarketIndex.FindTerminal;
             #endregion
 
+
+            //Add to shop
             Items.RegisterItem(device);
             Items.RegisterShopItem(device, null, null, CreateInfoNode(Name, Description), price.Value);
-            mls.LogInfo($"{modName} is active");
 
-            
+
+            mls.LogInfo($"{modName} is active");
         }
         private TerminalNode CreateInfoNode(string name, string description)
         {

@@ -12,7 +12,12 @@ namespace LC_StockMarketIndex.Patches
     {
         [HarmonyPatch("Start")]
         [HarmonyPostfix]
-        public void OnGameStart()
+        public static void OnGameStart()
+        {
+            CreateStocks();
+        }
+
+        public static void CreateStocks()
         {
             List<Stock> list = new List<Stock>();
             foreach (string company in StockMarketIndexMod.Companies)

@@ -19,7 +19,7 @@ namespace LC_StockMarketIndex.Patches
         //Stocks
 
         public int id;
-        public static Stock[] stocks;
+        public static Stock[] stocks = new Stock[0];
 
         public AudioSource audioSource;
         public TextMeshPro stockText;
@@ -27,7 +27,7 @@ namespace LC_StockMarketIndex.Patches
 
         public static Terminal terminal;
 
-        static float updateTime = 0;
+        float updateTime = 0;
 
         public override void Start()
         {
@@ -50,6 +50,9 @@ namespace LC_StockMarketIndex.Patches
             stockText = GetComponentInChildren<TextMeshPro>();
             if (terminal == null) terminal = FindObjectOfType<Terminal>();
 
+            if (stocks.Length <= 0)
+                StartGamePatch.CreateStocks();
+
                 UpdateText();
         }
         public static void FindTerminal(Scene scene, LoadSceneMode mode)
@@ -62,22 +65,17 @@ namespace LC_StockMarketIndex.Patches
         public override void Update()
         {
             base.Update();
-
-            if (NetworkObjectManager.GetIsHostOrServer())
+            if (updateTime <= 0)
             {
-
-                if (updateTime <= 0)
+                updateTime = 1;
+                for (int i = 0; i < stocks.Length; i++)
                 {
-                    for (int i = 0; i < stocks.Length; i++)
-                    {
-                        int change = stocks[i].GetCurrentValue();
-                        stocks[i].UpdatePrice(Time.time);
-                        if (change != stocks[i].GetCurrentValue()) NetworkObjectManager.SendValueToClients(i, stocks[i].GetCurrentValue());
-                    }
-                    updateTime = 1;
+                    int change = stocks[i].GetCurrentValue();
+                    stocks[i].UpdatePrice(Time.time);
                 }
-                else updateTime -= Time.deltaTime;
+                
             }
+            else updateTime -= Time.deltaTime;
         }
 
         public override void ItemInteractLeftRight(bool right)
@@ -105,8 +103,6 @@ namespace LC_StockMarketIndex.Patches
                 stocks[id].owned--;
                 terminal.groupCredits += stocks[id].GetCurrentValue();
                 terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
-                //Do server call to update the stocks owned value
-                NetworkObjectManager.SendOwnedToClients(id, stocks[id].owned);
             }
             else
             {
@@ -121,8 +117,6 @@ namespace LC_StockMarketIndex.Patches
                 stocks[id].owned++;
                 terminal.groupCredits -= stocks[id].GetCurrentValue();
                 terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
-                //Do server call to update the stocks owned value
-                NetworkObjectManager.SendOwnedToClients(id, stocks[id].owned);
             }
             else
             {
@@ -135,7 +129,7 @@ namespace LC_StockMarketIndex.Patches
         {
             string color = stocks[id].GetDailyGrowth() > 0 ? "green" : "red";
 
-            stockText.text = $"{stocks[id].name}  {stocks[id].GetCurrentValue()}$  <color={color}>{stocks[id].WriteDailyGrowth()}</color>  ({stocks[id].owned})"   +"   " + terminal.groupCredits;
+            stockText.text = $"{stocks[id].name}  {stocks[id].GetCurrentValue()}$  <color={color}>{stocks[id].WriteDailyGrowth()}</color>  {stocks[id].WriteValue()}$ ({stocks[id].owned}) ";
         }
 
         public override void EquipItem()
