@@ -142,7 +142,7 @@ namespace LC_StockMarketIndex.Patches
         }
         private float PerlinNoise(float time)
         {
-            float perlinValue = (float)(Mathf.Sin(2 * time) + Mathf.Sin(Mathf.PI * time));
+            float perlinValue = Mathf.PerlinNoise1D(time);
 
             return perlinValue;
         }

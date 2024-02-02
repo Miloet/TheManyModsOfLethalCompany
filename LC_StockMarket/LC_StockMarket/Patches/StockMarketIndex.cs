@@ -26,6 +26,11 @@ namespace LC_StockMarketIndex.Patches
         public PlayerControllerB previousPlayerHeldBy;
 
         public static Terminal terminal;
+        public static TimeOfDay timeScript;
+
+
+        public static int MarketOpen = 8;
+        public static int MarketClose = 17;
 
         float updateTime = 0;
 
@@ -49,6 +54,7 @@ namespace LC_StockMarketIndex.Patches
             audioSource = GetComponent<AudioSource>();
             stockText = GetComponentInChildren<TextMeshPro>();
             if (terminal == null) terminal = FindObjectOfType<Terminal>();
+            if(timeScript == null) timeScript = FindObjectOfType<TimeOfDay>();
 
             if (stocks.Length <= 0)
                 StartGamePatch.CreateStocks();
@@ -65,21 +71,26 @@ namespace LC_StockMarketIndex.Patches
         public override void Update()
         {
             base.Update();
+            
             if (updateTime <= 0)
             {
+                StockMarketIndexMod.mls.LogMessage(timeScript.hour + "  " + timeScript.currentDayTime);
                 updateTime = 1;
+                if (!CanTrade()) return;
                 for (int i = 0; i < stocks.Length; i++)
                 {
                     int change = stocks[i].GetCurrentValue();
                     stocks[i].UpdatePrice(Time.time);
                 }
-                
+
+                UpdateText();
             }
             else updateTime -= Time.deltaTime;
         }
 
         public override void ItemInteractLeftRight(bool right)
         {
+            if(!CanTrade()) return;
             base.ItemInteractLeftRight(right);
             if(right)
             {
@@ -94,7 +105,8 @@ namespace LC_StockMarketIndex.Patches
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
-            //NextStock();
+            if (!CanTrade()) return;
+            NextStock();
         }
         public void SellStock()
         {
@@ -127,9 +139,38 @@ namespace LC_StockMarketIndex.Patches
 
         public void UpdateText()
         {
-            string color = stocks[id].GetDailyGrowth() > 0 ? "green" : "red";
+            if (CanTrade())
+            {
 
-            stockText.text = $"{stocks[id].name}  {stocks[id].GetCurrentValue()}$  <color={color}>{stocks[id].WriteDailyGrowth()}</color>  {stocks[id].WriteValue()}$ ({stocks[id].owned}) ";
+                string color = stocks[id].GetDailyGrowth() > 0 ? "green" : "red";
+
+                stockText.text = $"{stocks[id].name}  {stocks[id].GetCurrentValue()}$  <color={color}>{stocks[id].WriteDailyGrowth()}</color>  {stocks[id].WriteValue()} ({stocks[id].owned}) ";
+            }
+            else stockText.text = $"Market is closed\nComeback between {TimeToClock(MarketOpen)} and {TimeToClock(MarketClose)}";
+        }
+
+        public void NextStock()
+        {
+            id = (int)Mathf.Repeat(id + 1, stocks.Length);
+            PlaySAM.SayString(stocks[id].name, audioSource);
+            UpdateText();
+        }
+
+        public bool CanTrade()
+        {
+            int num = (int)(timeScript.normalizedTimeOfDay * (60f * timeScript.numberOfHours)) + 360;
+            int num2 = (int)Mathf.Floor(num / 60);
+
+            int lastValidTime = (int)Mathf.Clamp(num2, MarketOpen,MarketClose);
+
+            return (num2 == lastValidTime);//&& SceneManager.GetActiveScene().name != "Ship");
+        }
+        public string TimeToClock(int time)
+        {
+            string period = (time < 12) ? "AM" : "PM";
+            int hour12 = (time % 12 == 0) ? 12 : time % 12;
+
+            return string.Format("{0:D2}:{1:D2} {2}", hour12, 0, period);
         }
 
         public override void EquipItem()
