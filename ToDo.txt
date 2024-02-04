@@ -1,26 +1,14 @@
 implement saving the stock data OR simply sell all stocks at the end of session
 implement already made stock market sim
 
+Add further display showing all the stocks
+
 update the stock once per second
 Update stock with next day after 
 
 make the static stocks:
 	1. save in the file (maybe does automatically)
 	2. same across all the computers
-
-Do whatever this is... dont quite know what i means but find out and do it.		
-Make sure that there is a .pdb file when you build your plugin. If it is not there, make sure that Debug Symbols is set to Portable and not embedded.
-
-
-
-Follow:
-1. Right-click on your project in Visual Studio Solution Explorer.
-2. Select "Properties" from the context menu.
-3. Go to the "Build Events" tab.
-4. In the "Post-build event command line" textbox, you can paste the provided commands.
-
-cd <NetcodePatcher Folder Directory Here>
-NetcodePatcher.dll $(TargetDir) deps/
 
 Make stocks unable to be traded when a level isnt loaded AND the time is between 9:30 and 16:00 
 

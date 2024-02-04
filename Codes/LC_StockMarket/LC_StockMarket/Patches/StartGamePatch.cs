@@ -26,5 +26,19 @@ namespace LC_StockMarketIndex.Patches
             }
             StockMarketIndex.stocks = list.ToArray();
         }
+
+        [HarmonyPatch(nameof(RoundManager.DespawnPropsAtEndOfRound))]
+        [HarmonyPostfix]
+        public static void NewDay()
+        {
+            var rm = RoundManager.Instance;
+
+            foreach (Stock stock in StockMarketIndex.stocks)
+            {
+                stock.NextDay(1);
+            }
+        }
+
+
     }
 }
