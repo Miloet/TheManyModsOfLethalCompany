@@ -12,10 +12,11 @@ namespace LC_StockMarketIndex.Patches
         public float value;
         float volatility;
         float growthMultiplier;
+        public float moneyToReachBaseGrowth;
 
         public int owned;
 
-
+        public string[] products; 
         float previousValue;
 
         static float universalGrowth = 1.01f;
@@ -25,99 +26,97 @@ namespace LC_StockMarketIndex.Patches
         public float tOffset;
         public float tMult;
 
+        public static Stock[] GetStocks()
+        {
+            List<Stock> list = new List<Stock>();
+            foreach(Company comp in (Company[])System.Enum.GetValues(typeof(Company)))
+            {
+                list.Add(new Stock(new StockType(comp)));
+            }
+            return list.ToArray();
+        }
         public struct StockType
         {
+            public string name;
             public float value;
             public float volatility;
             public float growthMultiplier;
-
-            public StockType(float val, float vol, float growth)
+            public int moneyToReachBaseGrowth;
+            public string[] products;
+            public StockType(Company company)
             {
-                value = val;
-                volatility = vol;
-                growthMultiplier = growth;
-            }
-
-            public enum Type
-            {
-                None,
-                PennyStock,
-                LowGrowth,
-                CrackStock,
-                Stable,
-                HighGrowth,
-                BlueChip,
-                DividendStock
-            }
-
-            public StockType(Type newType)
-            {
-                switch (newType)
+                switch (company)
                 {
-                    case Type.PennyStock:
-                        value = Random.Range(1, 10);
+                    case Company.HaldanElectronics:
+                        name = "Haldan Electronics INC";
+                        value = Random.Range(10, 30);
                         volatility = Random.Range(0.03f, 0.1f);
                         growthMultiplier = Random.Range(1.05f, 1.1f);
+                        moneyToReachBaseGrowth = 350;
+                        products = new string[] { "" };
                         break;
-                    case Type.LowGrowth:
-                        value = Random.Range(10, 30);
-                        volatility = Random.Range(0.03f, 0.15f);
-                        growthMultiplier = Random.Range(1.02f, 1.05f);
+                    case Company.KremmersCrematorium:
+                        name = "Kremmer's crematorium LLC";
+                        value = Random.Range(5, 10);
+                        volatility = 0;
+                        growthMultiplier = Random.Range(1.5f, 2f);
+                        moneyToReachBaseGrowth = 30;
+                        products = new string[] { "" };
                         break;
-                    case Type.CrackStock:
-                        value = Random.Range(5, 20);
-                        volatility = Random.Range(0.2f, 0.5f);
-                        growthMultiplier = Random.Range(0.5f, 0.8f);
-                        break;
-                    case Type.Stable:
-                        value = Random.Range(40, 80);
-                        volatility = Random.Range(0.01f, 0.05f);
-                        growthMultiplier = Random.Range(0.95f, 1.05f);
-                        break;
-                    case Type.HighGrowth:
-                        value = Random.Range(20, 60);
-                        volatility = Random.Range(0.1f, 0.3f);
-                        growthMultiplier = Random.Range(1.1f, 1.2f);
-                        break;
-                    case Type.BlueChip:
-                        value = Random.Range(70, 120);
-                        volatility = Random.Range(0.01f, 0.1f);
-                        growthMultiplier = Random.Range(1.02f, 1.08f);
-                        break;
-                    case Type.DividendStock:
-                        value = Random.Range(50, 100);
+                    case Company.FarmersUnion:
+                        name = "Farmer's Union INC";
+                        value = Random.Range(25, 60);
                         volatility = Random.Range(0.05f, 0.15f);
-                        growthMultiplier = Random.Range(0.95f, 1.1f);
+                        growthMultiplier = Random.Range(1.1f, 1.2f);
+                        moneyToReachBaseGrowth = 150;
+                        products = new string[] { "" };
+                        break;
+                    case Company.MidasScrap:
+                        name = "Midas Scrap LLC";
+                        value = Random.Range(10, 30);
+                        volatility = Random.Range(0.1f, 0.3f);
+                        growthMultiplier = Random.Range(0.8f, 3f);
+                        moneyToReachBaseGrowth = 100;
+                        products = new string[] { "" };
+                        break;
+                    case Company.Blockbuster:
+                        name = "Blockbuster LLC";
+                        value = Random.Range(80, 120);
+                        volatility = Random.Range(0.05f, 0.1f);
+                        growthMultiplier = Random.Range(1.2f, 1.4f);
+                        moneyToReachBaseGrowth = 300;
+                        products = new string[] { "" };
+                        break;
+                    case Company.HandyToolsNHardware:
+                        name = "Handy tools n' Hardware INC";
+                        value = Random.Range(5, 60);
+                        volatility = Random.Range(0.0f, 0.1f);
+                        growthMultiplier = Random.Range(1.1f, 1.3f);
+                        moneyToReachBaseGrowth = 150;
+                        products = new string[] { "" };
                         break;
                     default:
-                        value = Random.Range(10, 50);
-                        volatility = Random.Range(0.03f, 0.2f);
-                        growthMultiplier = Random.Range(.9f, 1.1f);
+                        name = "";
+                        value = 1;
+                        volatility = 1;
+                        growthMultiplier = 1;
+                        moneyToReachBaseGrowth = 1;
+                        products = new string[] { "" };
                         break;
+
                 }
             }
-
-            public static Type RandomType()
-            {
-                return (Type)Random.Range(1, Type.GetValues(typeof(Type)).Length);
-            }
         }
 
-        public Stock(string stockName, float initialValue = 100, float initialVolatility = 0.05f, float usualGrowth = 1.2f)
+        public Stock(StockType stockType)
         {
-            name = stockName;
-            previousValue = initialValue;
-            value = initialValue * (1 + volatility *  Random.Range(-1,1));
-            volatility = initialVolatility;
-            growthMultiplier = usualGrowth;
-        }
-        public Stock(string stockName, StockType stockType)
-        {
-            name = stockName;
+            name = "";
             previousValue = stockType.value;
             value = stockType.value * (1 + volatility * Random.Range(-1, 1));
             volatility = stockType.volatility;
             growthMultiplier = stockType.growthMultiplier;
+            products = stockType.products;
+            moneyToReachBaseGrowth = stockType.moneyToReachBaseGrowth;
         }
 
 
@@ -125,9 +124,9 @@ namespace LC_StockMarketIndex.Patches
         public void NextDay(float growth)
         {
             float earlyMultiplier = 1;
-            if (currentDay < lowGrowthDays) earlyMultiplier = currentDay / lowGrowthDays;
-
-            float scaledGrowth = Mathf.Max(-1f, Mathf.Min(1f, growth)) * growthMultiplier;
+            if (currentDay < lowGrowthDays) earlyMultiplier = (float)currentDay / (float)lowGrowthDays;
+            
+            float scaledGrowth = growth * growthMultiplier;
             NewValue(value * (universalGrowth + scaledGrowth * earlyMultiplier) * (1 + volatility * Random.Range(-1, 1) * earlyMultiplier));
         }
         public void UpdatePrice(float time)
@@ -175,5 +174,14 @@ namespace LC_StockMarketIndex.Patches
         {
             return (float)(value / previousValue - 1);
         }
+    }
+    public enum Company
+    {
+        HaldanElectronics,
+        KremmersCrematorium,
+        Blockbuster,
+        MidasScrap,
+        FarmersUnion,
+        HandyToolsNHardware
     }
 }

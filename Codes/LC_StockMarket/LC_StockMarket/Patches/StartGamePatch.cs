@@ -19,12 +19,7 @@ namespace LC_StockMarketIndex.Patches
 
         public static void CreateStocks()
         {
-            List<Stock> list = new List<Stock>();
-            foreach (string company in StockMarketIndexMod.Companies)
-            {
-                list.Add(new Stock(company, new Stock.StockType(Stock.StockType.RandomType())));
-            }
-            StockMarketIndex.stocks = list.ToArray();
+            StockMarketIndex.stocks = Stock.GetStocks();
         }
 
         [HarmonyPatch(nameof(RoundManager.DespawnPropsAtEndOfRound))]
@@ -33,9 +28,37 @@ namespace LC_StockMarketIndex.Patches
         {
             var rm = RoundManager.Instance;
 
+            GrabbableObject[] scrap = Object.FindObjectsOfType<GrabbableObject>();
+            List<GrabbableObject> NoneCollectedScrap = new List<GrabbableObject>();
+            List<GrabbableObject> CollectedScrap = rm.scrapCollectedThisRound;
+            foreach (GrabbableObject s in scrap)
+            {
+                if (!s.scrapPersistedThroughRounds && !(s.isInElevator || s.isInShipRoom || s.isPocketed)) NoneCollectedScrap.Add(s);
+            }
+
+            List<string> collectedScrap = new List<string>();
+            List<string> noneCollectedScrap = new List<string>();
+
+            foreach (GrabbableObject g in CollectedScrap)
+            {
+                collectedScrap.Add(g.itemProperties.itemName);
+            }
+            foreach (GrabbableObject g in NoneCollectedScrap)
+            {
+                noneCollectedScrap.Add(g.itemProperties.itemName);
+            }
+
             foreach (Stock stock in StockMarketIndex.stocks)
             {
-                stock.NextDay(1);
+                float growth = 0;
+
+                foreach (string product in stock.products)
+                {
+                    growth += collectedScrap.Count(s => s == product) / stock.moneyToReachBaseGrowth;
+                    growth -= noneCollectedScrap.Count(s => s == product) / stock.moneyToReachBaseGrowth;
+                }
+
+                stock.NextDay(growth);
             }
         }
 
