@@ -38,7 +38,11 @@ namespace LC_StockMarketIndex.Patches
         {
             base.Start();
 
-
+            //Write all Existing 
+            foreach(var g in FindObjectsOfType<GrabbableObject>())
+            {
+                StockMarketIndexMod.mls.LogMessage($"{g.itemProperties.itemName}");
+            }
 
             //Assure correct spawning
 
@@ -135,12 +139,6 @@ namespace LC_StockMarketIndex.Patches
                 PlaySAM.SayString($"You are too broke to buy {stocks[id].name}. Broke bitch", audioSource);
             }
             UpdateText();
-        }
-
-
-        public void NextStock()
-        {
-            id += 
         }
 
         public void UpdateText()

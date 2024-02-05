@@ -42,9 +42,6 @@ namespace LC_StockMarketIndex
 
         static float size = 4f;
 
-        public static string[] Companies = {"Cruetly Squad","Apple","Haldan Electronics","FacePunch","The Company", "Kremmer's crematorium", "Zeekers"};
-
-
         public static GameObject networkObject;
 
         void Awake()
