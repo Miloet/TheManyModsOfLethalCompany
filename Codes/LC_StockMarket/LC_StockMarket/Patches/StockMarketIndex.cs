@@ -39,9 +39,9 @@ namespace LC_StockMarketIndex.Patches
             base.Start();
 
             //Write all Existing 
-            foreach(var g in FindObjectsOfType<GrabbableObject>())
+            foreach(var g in StartOfRound.Instance.allItemsList.itemsList)
             {
-                StockMarketIndexMod.mls.LogMessage($"{g.itemProperties.itemName}");
+                StockMarketIndexMod.mls.LogMessage($"{g.itemName}");
             }
 
             //Assure correct spawning
@@ -57,6 +57,7 @@ namespace LC_StockMarketIndex.Patches
             mainObjectRenderer = GetComponent<MeshRenderer>();
             audioSource = GetComponent<AudioSource>();
             stockText = GetComponentInChildren<TextMeshPro>();
+            stockText.font = FindObjectOfType<TextMeshProUGUI>().font;
             if (terminal == null) terminal = FindObjectOfType<Terminal>();
             if(timeScript == null) timeScript = FindObjectOfType<TimeOfDay>();
 
@@ -78,7 +79,6 @@ namespace LC_StockMarketIndex.Patches
             
             if (updateTime <= 0)
             {
-                StockMarketIndexMod.mls.LogMessage(timeScript.hour + "  " + timeScript.currentDayTime);
                 updateTime = 1;
                 if (!CanTrade()) return;
                 for (int i = 0; i < stocks.Length; i++)

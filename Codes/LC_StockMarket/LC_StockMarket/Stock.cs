@@ -53,7 +53,21 @@ namespace LC_StockMarketIndex.Patches
                         volatility = Random.Range(0.03f, 0.1f);
                         growthMultiplier = Random.Range(1.05f, 1.1f);
                         moneyToReachBaseGrowth = 350;
-                        products = new string[] { "" };
+                        products = new string[] {
+    "Apparatus",
+    "Cash register",
+    "Chemical jug",
+    "Shotgun",
+    "Fancy lamp",
+    "Hairdryer",
+    "Laser pointer",
+    "Old phone",
+    "Remote",
+    "Toy robot",
+    "Steering wheel",
+    "Teeth",
+    "V-type engine"
+}; ;
                         break;
                     case Company.KremmersCrematorium:
                         name = "Kremmer's crematorium LLC";
@@ -69,7 +83,19 @@ namespace LC_StockMarketIndex.Patches
                         volatility = Random.Range(0.05f, 0.15f);
                         growthMultiplier = Random.Range(1.1f, 1.2f);
                         moneyToReachBaseGrowth = 150;
-                        products = new string[] { "" };
+                        products = new string[] {
+    "Hive",
+    "Candy",
+    "Cookie mold pan",
+    "Egg beater",
+    "Jar of pickles",
+    "Blåhaj",
+    "Plastic Fish",
+    "Blahaj",
+    "Plushie",
+    "Red soda",
+    "Maxwell"
+};
                         break;
                     case Company.MidasScrap:
                         name = "Midas Scrap LLC";
@@ -77,7 +103,11 @@ namespace LC_StockMarketIndex.Patches
                         volatility = Random.Range(0.1f, 0.3f);
                         growthMultiplier = Random.Range(0.8f, 3f);
                         moneyToReachBaseGrowth = 100;
-                        products = new string[] { "" };
+                        products = new string[] {
+    "Homemade flashbang",
+    "Gold bar",
+    "Golden cup"
+};
                         break;
                     case Company.Blockbuster:
                         name = "Blockbuster LLC";
@@ -85,7 +115,17 @@ namespace LC_StockMarketIndex.Patches
                         volatility = Random.Range(0.05f, 0.1f);
                         growthMultiplier = Random.Range(1.2f, 1.4f);
                         moneyToReachBaseGrowth = 300;
-                        products = new string[] { "" };
+                        products = new string[] {"Comedy",
+    "Gift",
+    "Painting",
+    "Perfume bottle",
+    "Pill bottle",
+    "Stop sign",
+    "Toothpaste",
+    "Toy cube",
+    "Tragedy",
+    "Yield sign"
+}; ;
                         break;
                     case Company.HandyToolsNHardware:
                         name = "Handy tools n' Hardware INC";
@@ -93,7 +133,7 @@ namespace LC_StockMarketIndex.Patches
                         volatility = Random.Range(0.0f, 0.1f);
                         growthMultiplier = Random.Range(1.1f, 1.3f);
                         moneyToReachBaseGrowth = 150;
-                        products = new string[] { "" };
+                        products = new string[] { "Airhorn", "Big bolt", "Bottles", "Bell", "Clown horn", "Mug", "Dust pan", "Flask", "Brush", "Large axle", "Magic 7 ball", "Magnifying glass", "Ring", "Rubber Ducky", "Metal sheet", "Tea kettle", "Whoopie cushion" };
                         break;
                     default:
                         name = "";
@@ -101,7 +141,7 @@ namespace LC_StockMarketIndex.Patches
                         volatility = 1;
                         growthMultiplier = 1;
                         moneyToReachBaseGrowth = 1;
-                        products = new string[] { "" };
+                        products = new string[] { "Maxwell" };
                         break;
 
                 }
@@ -110,7 +150,7 @@ namespace LC_StockMarketIndex.Patches
 
         public Stock(StockType stockType)
         {
-            name = "";
+            name = stockType.name;
             previousValue = stockType.value;
             value = stockType.value * (1 + volatility * Random.Range(-1, 1));
             volatility = stockType.volatility;
@@ -131,7 +171,7 @@ namespace LC_StockMarketIndex.Patches
         }
         public void UpdatePrice(float time)
         {
-            float noise = PerlinNoise(time);
+            float noise = (PerlinNoise(time) - 0.5f) * 2f;
             NewValue(value + noise * volatility * value * 0.1f, false);
         }
         public void NewValue(float newValue, bool updateOldValue = true)
@@ -165,7 +205,6 @@ namespace LC_StockMarketIndex.Patches
         {
             return (int)Mathf.Ceil(value);
         }
-
         public string WriteDailyGrowth()
         {
             return $"{(GetDailyGrowth() * 100f).ToString("N1")}%";

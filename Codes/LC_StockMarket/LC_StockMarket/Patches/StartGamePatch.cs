@@ -51,12 +51,18 @@ namespace LC_StockMarketIndex.Patches
             foreach (Stock stock in StockMarketIndex.stocks)
             {
                 float growth = 0;
+                
+                if (stock.name == "Kremmer's crematorium LLC") stock.products = StartOfRound.Instance.allPlayerScripts.Select(player => player.playerUsername).ToArray();
 
                 foreach (string product in stock.products)
                 {
-                    growth += collectedScrap.Count(s => s == product) / stock.moneyToReachBaseGrowth;
-                    growth -= noneCollectedScrap.Count(s => s == product) / stock.moneyToReachBaseGrowth;
+                    float value1 = collectedScrap.Contains(product) ? CollectedScrap.First(g => g.itemProperties.itemName == product).scrapValue : 0;
+                    float value2 = noneCollectedScrap.Contains(product) ? NoneCollectedScrap.First(g => g.itemProperties.itemName == product).scrapValue : 0;
+                    growth += collectedScrap.Count(s => s == product) * value1 / stock.moneyToReachBaseGrowth;
+                    growth -= noneCollectedScrap.Count(s => s == product) * value2 / stock.moneyToReachBaseGrowth;
                 }
+
+                StockMarketIndexMod.mls.LogMessage($"{stock.name} is experiencing a growth of {growth}. This means an effective growth of");
 
                 stock.NextDay(growth);
             }
