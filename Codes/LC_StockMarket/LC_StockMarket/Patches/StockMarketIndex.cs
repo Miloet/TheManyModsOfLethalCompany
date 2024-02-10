@@ -80,14 +80,13 @@ namespace LC_StockMarketIndex.Patches
             if (updateTime <= 0)
             {
                 updateTime = 1;
+                UpdateText();
                 if (!CanTrade()) return;
                 for (int i = 0; i < stocks.Length; i++)
                 {
                     int change = stocks[i].GetCurrentValue();
                     stocks[i].UpdatePrice(Time.time);
                 }
-
-                UpdateText();
             }
             else updateTime -= Time.deltaTime;
         }
@@ -109,7 +108,11 @@ namespace LC_StockMarketIndex.Patches
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
-            if (!CanTrade()) return;
+            if (!CanTrade()) 
+            {
+                PlaySAM.SayString("The market isnt open yet, impatient idiot.", audioSource);
+                return;
+            }
             NextStock();
         }
         public void SellStock()
@@ -145,12 +148,11 @@ namespace LC_StockMarketIndex.Patches
         {
             if (CanTrade())
             {
-
                 string color = stocks[id].GetDailyGrowth() > 0 ? "green" : "red";
 
                 stockText.text = $"{stocks[id].name}  {stocks[id].GetCurrentValue()}$  <color={color}>{stocks[id].WriteDailyGrowth()}</color>  {stocks[id].WriteValue()} ({stocks[id].owned}) ";
             }
-            else stockText.text = $"Market is closed\nComeback between {TimeToClock(MarketOpen)} and {TimeToClock(MarketClose)}";
+            else stockText.text = CantTradeReason();
         }
 
         public void NextStock()
@@ -167,8 +169,21 @@ namespace LC_StockMarketIndex.Patches
 
             int lastValidTime = (int)Mathf.Clamp(num2, MarketOpen,MarketClose);
 
-            return (num2 == lastValidTime);//&& SceneManager.GetActiveScene().name != "Ship");
+            return (num2 == lastValidTime) && playerHeldBy != null && !(playerHeldBy.isInHangarShipRoom || playerHeldBy.isInsideFactory);
         }
+        public string CantTradeReason()
+        {
+            int num = (int)(timeScript.normalizedTimeOfDay * (60f * timeScript.numberOfHours)) + 360;
+            int num2 = (int)Mathf.Floor(num / 60);
+
+            int lastValidTime = (int)Mathf.Clamp(num2, MarketOpen, MarketClose);
+
+            if (num2 != lastValidTime) return $"Market is currently closed.\nComeback between {TimeToClock(MarketOpen)} and {TimeToClock(MarketClose)}";
+            if (playerHeldBy != null && (playerHeldBy.isInHangarShipRoom || playerHeldBy.isInsideFactory)) return "Weak signal, cannot get market prices. Go outside.";
+            return "I should work... if not i am broken :<";
+        }
+
+
         public string TimeToClock(int time)
         {
             string period = (time < 12) ? "AM" : "PM";
@@ -194,6 +209,7 @@ namespace LC_StockMarketIndex.Patches
         {
             base.DiscardItem();
             previousPlayerHeldBy.equippedUsableItemQE = false;
+            previousPlayerHeldBy = null;
         }
         public override void PocketItem()
         {
