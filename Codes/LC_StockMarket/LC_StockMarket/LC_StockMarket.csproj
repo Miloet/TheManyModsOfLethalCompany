@@ -124,6 +124,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="TerminalApi">
+      <HintPath>..\..\..\..\..\..\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\my mod test\BepInEx\plugins\NotAtomicBomb-TerminalApi\TerminalApi.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Burst, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Evaisa.NetcodePatcher.MSBuild.3.3.4\lib\net472\Unity.Burst.dll</HintPath>
     </Reference>

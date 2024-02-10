@@ -19,7 +19,7 @@ namespace LC_StockMarketIndex.Patches
         public string[] products; 
         float previousValue;
 
-        static float universalGrowth = 1.01f;
+        static float universalGrowth = 0.2f;
         static int lowGrowthDays = 4;
         public static int currentDay = 0;
 
@@ -110,7 +110,7 @@ namespace LC_StockMarketIndex.Patches
 
         public Stock(StockType stockType)
         {
-            name = "";
+            name = stockType.name;
             previousValue = stockType.value;
             value = stockType.value * (1 + volatility * Random.Range(-1, 1));
             volatility = stockType.volatility;
@@ -123,16 +123,38 @@ namespace LC_StockMarketIndex.Patches
         //Value
         public void NextDay(float growth)
         {
-            float earlyMultiplier = 1;
-            if (currentDay < lowGrowthDays) earlyMultiplier = (float)currentDay / (float)lowGrowthDays;
-            
-            float scaledGrowth = growth * growthMultiplier;
-            NewValue(value * (universalGrowth + scaledGrowth * earlyMultiplier) * (1 + volatility * Random.Range(-1, 1) * earlyMultiplier));
+            float scaledGrowth;
+            if (growth > 0) 
+            {
+                scaledGrowth = 1 + growth * growthMultiplier * universalGrowth;
+            }
+            else
+            {
+                var val = 1f / (growthMultiplier * universalGrowth);
+                scaledGrowth = val / (val -growth);
+            }
+
+            if (currentDay < lowGrowthDays) Mathf.Clamp(scaledGrowth, (float)currentDay / (float)lowGrowthDays,1f / ((float)currentDay / (float)lowGrowthDays));
+
+            NewValue(value * (scaledGrowth) * (1 + volatility * Random.Range(-1, 1)));
         }
         public void UpdatePrice(float time)
         {
-            float noise = PerlinNoise(time);
-            NewValue(value + noise * volatility * value * 0.1f, false);
+            float overDayGrowth = 0.2f * universalGrowth * (volatility);
+            float preNoise = PerlinNoise(time);
+            float noise = Mathf.Pow(preNoise,2f) * overDayGrowth;
+            
+            float priceChange = 1;
+
+            if(preNoise >= 0)
+            {
+                priceChange = 1f + noise;
+            }
+            else
+            {
+                priceChange = 1f / (Mathf.Abs(noise)+1f);
+            }
+            NewValue(value * priceChange, false);
         }
         public void NewValue(float newValue, bool updateOldValue = true)
         {
@@ -141,7 +163,7 @@ namespace LC_StockMarketIndex.Patches
         }
         private float PerlinNoise(float time)
         {
-            float perlinValue = Mathf.PerlinNoise1D(time);
+            float perlinValue = Random.Range(-2f, 2f);
 
             return perlinValue;
         }

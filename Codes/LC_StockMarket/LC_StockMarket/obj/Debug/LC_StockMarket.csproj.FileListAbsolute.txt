@@ -412,3 +412,4 @@ C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_StockMarket\LC_StockMarket\bin\Debug\MonoMod.Utils.xml
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_StockMarket\LC_StockMarket\bin\Debug\MonoMod.RuntimeDetour.xml
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_StockMarket\LC_StockMarket\obj\Debug\LC_StockMarket.csproj.CopyComplete
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_StockMarket\LC_StockMarket\bin\Debug\TerminalApi.dll
