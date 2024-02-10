@@ -46,7 +46,7 @@ namespace LC_StockMarketIndex.Patches
 
             //Assure correct spawning
 
-            if (isInShipRoom && isInElevator)
+            if (transform.parent == null && isInShipRoom && isInElevator && StartOfRound.Instance != null && StartOfRound.Instance.elevatorTransform != null)
             {
                 transform.SetParent(StartOfRound.Instance.elevatorTransform, false);
                 targetFloorPosition = transform.localPosition - transform.parent.position;
@@ -64,7 +64,7 @@ namespace LC_StockMarketIndex.Patches
             if (stocks.Length <= 0)
                 StartGamePatch.CreateStocks();
 
-                UpdateText();
+            UpdateText();
         }
         public static void FindTerminal(Scene scene, LoadSceneMode mode)
         {

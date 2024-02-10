@@ -27,7 +27,7 @@ namespace LC_StockMarketIndex
         private const string modName = "StockMarketIndex";
         private const string modVersion = "0.0.1";
 
-        private const string assetName = "device.stock";
+        private const string assetName = "stock.device";
         private const string gameObjectName = "StockIndex.prefab";
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -42,11 +42,6 @@ namespace LC_StockMarketIndex
 
         static ConfigEntry<int> price;
         public static ConfigEntry<bool> voice;
-
-        static Vector3 positionInHand = new Vector3(-0.08f, -0.05f, 0.07f);
-        static Vector3 rotationInHand = new Vector3(-165, -75f, 0);
-
-        static float size = 4f;
 
         public static GameObject networkObject;
 
@@ -73,52 +68,15 @@ namespace LC_StockMarketIndex
             mls.LogMessage(path);
 
             AssetBundle assets = AssetBundle.LoadFromFile(path);
-            Item device = ScriptableObject.CreateInstance<Item>();
+            Item device = assets.LoadAsset<Item>("Stock.asset");
 
             GameObject deviceObject = assets.LoadAsset<GameObject>(gameObjectName);
-
-
-            //Sounds
-
-            device.grabSFX = assets.LoadAsset<AudioClip>("Grab.wav");
-            device.pocketSFX = assets.LoadAsset<AudioClip>("Pocket.wav");
-            device.dropSFX = assets.LoadAsset<AudioClip>("Drop.wav");
-            device.throwSFX = device.dropSFX;
-
-            //Item
-            #region
-
-            device.name = Name;
-            device.itemName = Name;
-
-            device.restingRotation = new Vector3(0, 90, 0);
-            device.canBeGrabbedBeforeGameStart = false;
-            device.isConductiveMetal = true;
-            device.isScrap = false;
-            device.canBeInspected = true;
-            device.itemIcon = assets.LoadAsset<Sprite>("Icon.png");
-
-            device.rotationOffset = rotationInHand;
-            var positions = positionInHand / 3f * size;
-            device.positionOffset = new Vector3(positions.y, positions.z, positions.x);
-
-            device.batteryUsage = 0;
-            device.requiresBattery = false;
-            device.automaticallySetUsingPower = false;
-
-            device.toolTips = new string[] { "Next : [LMB]", "Buy : [Q]", "Sell : [E]"};
-
-            #endregion
 
             //GameObject
             #region
 
             //Assign Components
 
-            deviceObject.transform.localScale = Vector3.one * size;
-
-            deviceObject.AddComponent<NetworkObject>();
-            deviceObject.AddComponent<AudioSource>();
             StockMarketIndex smi = deviceObject.AddComponent<StockMarketIndex>();
             
             smi.originalScale = deviceObject.transform.localScale;
@@ -135,6 +93,8 @@ namespace LC_StockMarketIndex
             //Add to shop
             Items.RegisterItem(device);
             Items.RegisterShopItem(device, null, null, CreateInfoNode(Name, Description), price.Value);
+
+            #region Terminal Entries
 
             AddTerminalCommand("Blockbuster LLC",
 "An ancient company that produces and sells strange arcane artifacts. The sole patent owner for the “quantum superposition box”, sold as the “perfect gift box” that is advertised to become whatever the receiver wants it to be once opened. The company owns major stock in several biotech companies, some of which produce biological weapons. \\nSome rumors say it once was a video rental service, but it's often scoffed at as being highly unfactual. <i>“Video rental as a service and core business model is stupid and doomed to fail. The people that truly believe that one of the top NASDAQ companies could start from such a business model, I can only describe as mentally inefficient.”</i> According to one seasoned economist who was asked about the topic.");
@@ -168,8 +128,8 @@ namespace LC_StockMarketIndex
 
             AddTerminalCommand("Handy tool's n' Hardware",
                 "company info");
-             		 
 
+            #endregion
 
             mls.LogInfo($"{modName} is active");
         }
