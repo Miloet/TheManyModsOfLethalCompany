@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>d6700c5d-017d-454f-830b-9d752ea84fd6</ProjectGuid>
+    <ProjectGuid>8a19c370-df01-4355-878e-94a5f517f97b</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LC_BugSnacks</RootNamespace>
-    <AssemblyName>LC_BugSnacks</AssemblyName>
+    <RootNamespace>LC_HoardingBugSnacks</RootNamespace>
+    <AssemblyName>LC_HoardingBugSnacks</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
