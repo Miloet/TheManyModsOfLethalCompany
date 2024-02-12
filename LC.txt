@@ -4,9 +4,6 @@ Buyable Lightning rod upgrade for the ship
 	Removes / diverts random lightning
 	Adds a chance the targeted lightning will strike the ship instead.
 
-
-
-
 Monster energy case (scrap)
 	if picked up by a hoarding bug it will  become very fast
 	download the model of the bottles case and use that as the base
@@ -40,10 +37,6 @@ in a hoardingbug patch
 
 Electric Emergency stim shot (EESS) (equipment)
 	heal a set amount of hp and has one use but can be recharged
-
-Portable Stock market
-		Terminal.groupCredits = newCreditAmount;
-		Terminal.SyncGroupCreditsClientRpc(newCreditAmount,Terminal.numItemsInShip);
 
 
 Comically large E-Pill bottle (high value scrap)
