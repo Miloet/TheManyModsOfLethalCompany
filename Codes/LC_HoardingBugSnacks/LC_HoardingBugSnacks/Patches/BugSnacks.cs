@@ -6,21 +6,40 @@ using System.Text;
 using System.Threading.Tasks;
 using GameNetcodeStuff;
 using UnityEngine;
-using HoarderBud.Patches;
-using HoarderBud;
-using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 
 namespace LC_HoardingBugSnacks.Patches
 {
     public class BugSnacks : GrabbableObject
     {
+        public override void Start()
+        {
+            base.Start();
+            foreach (var g in FindObjectsOfType<GrabbableObject>())
+            {
+                HoardingBugSnacksMod.mls.LogMessage($"{g.itemProperties.itemName}" +
+                    $"\n\tgrabAnim: {g.itemProperties.grabAnim}" +
+                    $"\n\tpocketAnim: {g.itemProperties.pocketAnim}" +
+                    $"\n\tuseAnim: {g.itemProperties.useAnim}" +
+                    $"\n\tthrowAnim: {g.itemProperties.throwAnim}");
+            }
+        }
+
+        public override void ItemActivate(bool used, bool buttonDown = true)
+        {
+            base.ItemActivate(used, buttonDown);
+            if (buttonDown)
+            {
+                playerHeldBy.playerBodyAnimator.SetTrigger("shakeItem");
+            }
+        }
 
         public override void GrabItemFromEnemy(EnemyAI enemy)
         {
-            if (enemy is HoarderBugAI)
+            base.GrabItemFromEnemy(enemy);
+            if (enemy != null && enemy is HoarderBugAI)
             {
                 var bug = (HoarderBugAI)enemy;
-                BecomeFriends(bug, 15f);
+                BecomeFriends(bug, 15f, true);
             }
         }
 

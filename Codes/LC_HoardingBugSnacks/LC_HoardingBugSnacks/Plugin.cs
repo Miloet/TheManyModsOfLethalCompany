@@ -22,7 +22,7 @@ namespace LC_HoardingBugSnacks
         private const string modName = "HoardingBugSnacks";
         private const string modVersion = "0.0.1";
 
-        private const string assetName = "bug.snacks";
+        private const string assetName = "bug.snack";
         private const string gameObjectName = "BugSnacks.prefab";
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -41,9 +41,11 @@ namespace LC_HoardingBugSnacks
 
             mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
 
+            harmony.PatchAll(typeof(SpawnPatch));
             harmony.PatchAll();
 
-            #region Stock market index device
+
+            #region
 
             //Assign Config Settings
 
@@ -57,10 +59,15 @@ namespace LC_HoardingBugSnacks
             mls.LogMessage(path);
 
             AssetBundle assets = AssetBundle.LoadFromFile(path);
-            Item item = ScriptableObject.CreateInstance<Item>();
+            Item item = assets.LoadAsset<Item>("BugSnacks.asset");
 
             GameObject Object = assets.LoadAsset<GameObject>(gameObjectName);
-            Object.AddComponent<BugSnacks>();
+            var bugSnacks = Object.AddComponent<BugSnacks>();
+
+            bugSnacks.itemProperties = item;
+            bugSnacks.grabbable = true;
+            bugSnacks.grabbableToEnemies = true;
+
 
 
             #endregion
