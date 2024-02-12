@@ -43,6 +43,9 @@
     <Reference Include="Facepunch Transport for Netcode for GameObjects">
       <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Facepunch Transport for Netcode for GameObjects.dll</HintPath>
     </Reference>
+    <Reference Include="HoarderBud">
+      <HintPath>..\..\..\..\..\..\Desktop\HoarderBud.dll</HintPath>
+    </Reference>
     <Reference Include="LethalLib">
       <HintPath>..\..\..\..\..\..\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\my mod test\BepInEx\plugins\Evaisa-LethalLib\LethalLib\LethalLib.dll</HintPath>
     </Reference>
@@ -69,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Patches\BugSnacks.cs" />
+    <Compile Include="Patches\HoarderBugAIPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
