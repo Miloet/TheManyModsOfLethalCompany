@@ -35,6 +35,8 @@ namespace LC_HoardingBugSnacks
 
         static ConfigEntry<int> price;
 
+        public static Item shotgunItem;
+
         void Awake()
         {
             if (instance == null) instance = this;
@@ -44,8 +46,7 @@ namespace LC_HoardingBugSnacks
             harmony.PatchAll(typeof(SpawnPatch));
             harmony.PatchAll();
 
-
-            #region
+            #region Set up item
 
             //Assign Config Settings
 
@@ -71,6 +72,14 @@ namespace LC_HoardingBugSnacks
 
 
             #endregion
+
+            foreach(Item maybeShotgun in Resources.FindObjectsOfTypeAll(typeof(Item)))
+            {
+                if(maybeShotgun.itemName == "Shotgun") shotgunItem = maybeShotgun;
+            }
+
+            
+
 
             //Add to shop
             Items.RegisterItem(item);

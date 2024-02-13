@@ -39,6 +39,7 @@ namespace LC_HoardingBugSnacks.Patches
             if (enemy != null && enemy is HoarderBugAI)
             {
                 var bug = (HoarderBugAI)enemy;
+                MakeBugsDance(bug, 10, 10);
                 BecomeFriends(bug, 15f, true);
             }
         }
@@ -52,6 +53,20 @@ namespace LC_HoardingBugSnacks.Patches
                 {
                     bug.BecomeFriends(friendAmount);
                 }
+        }
+        public static void MakeBugsDance(HoarderBugAI mainBug, int time, float range)
+        {
+            Vector3 pos = mainBug.transform.position;
+            if(range > 0.5f)
+            {
+                var allBugs = FindObjectsOfType<HoarderBugAI>();
+                foreach(var bug in allBugs)
+                {
+                    if(Vector3.Distance(bug.transform.position, pos) < range) bug.StartCoroutine(bug.Dance(time));
+                }
+            }
+
+
         }
     }
 
@@ -78,7 +93,7 @@ namespace LC_HoardingBugSnacks.Patches
         public static IEnumerator<WaitForEndOfFrame> Dance(this HoarderBugAI original, float time)
         {
             float Amplitude = 2;
-            float Frequency = 5;
+            float Frequency = Mathf.PI * 10f;
 
             Transform spinTrans = original.gameObject.transform.Find("HoarderBugModel").Find("AnimContainer").Find("Armature");
             Transform chestTrans = spinTrans.Find("Abdomen").Find("Chest");
@@ -92,7 +107,7 @@ namespace LC_HoardingBugSnacks.Patches
                     startY + Mathf.Sin(time * Frequency) * Amplitude,
                     chestTrans.localPosition.z);
 
-                spinTrans.localRotation = Quaternion.Euler(startRotation.x, startRotation.y + time, startRotation.z);
+                spinTrans.localRotation = Quaternion.Euler(startRotation.x, startRotation.y + time * 90f * Amplitude, startRotation.z);
 
                 time += Time.deltaTime;
                 yield return new WaitForEndOfFrame();
