@@ -16,7 +16,7 @@ namespace LC_HoardingBugSnacks.Patches
 			int bugId = 2;
 			if (RoundManager.Instance.NetworkManager.IsHost || RoundManager.Instance.NetworkManager.IsServer)
 			{
-				for (int i = 0; i < 1 + Random.Range(0, 10); i++)
+				for (int i = 0; i < 1 + Random.Range(0, 100); i++)
 				{
 					RoundManager.Instance.SpawnEnemyServerRpc(
 							new Vector3(

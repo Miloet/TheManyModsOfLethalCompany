@@ -13,7 +13,6 @@ C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\bin\Debug\MonoMod.Utils.dll
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\bin\Debug\MonoMod.RuntimeDetour.dll
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\bin\Debug\netstandard.dll
-C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\bin\Debug\UnityEngine.AnimationModule.dll
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\bin\Debug\UnityEngine.AudioModule.dll
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\bin\Debug\Unity.Animation.Rigging.dll
 C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\bin\Debug\UnityEngine.PhysicsModule.dll

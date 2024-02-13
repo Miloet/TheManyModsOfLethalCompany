@@ -39,6 +39,7 @@ namespace LC_HoardingBugSnacks.Patches
             if (enemy != null && enemy is HoarderBugAI)
             {
                 var bug = (HoarderBugAI)enemy;
+                bug.StartCoroutine(bug.Dance(10));
                 BecomeFriends(bug, 15f, true);
             }
         }
