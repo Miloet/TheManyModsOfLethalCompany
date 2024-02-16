@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace LC_HoardingBugSnacks.Patches
 {
-    public class BugSnacks : GrabbableObject
+    public class BugSnacks : PhysicsProp
     {
         public override void Start()
         {
@@ -62,11 +62,10 @@ namespace LC_HoardingBugSnacks.Patches
                 var allBugs = FindObjectsOfType<HoarderBugAI>();
                 foreach(var bug in allBugs)
                 {
-                    if(Vector3.Distance(bug.transform.position, pos.position) < range) bug.StartCoroutine(bug.Dance(time));
+                    if (Vector3.Distance(bug.transform.position, pos.position) < range) bug.StartDance(time);
+                    //StartCoroutine(bug.Dance(time));
                 }
             }
-
-
         }
     }
 
@@ -90,28 +89,33 @@ namespace LC_HoardingBugSnacks.Patches
             original.angryTimer -= amount;
         }
 
-        public static IEnumerator<WaitForEndOfFrame> Dance(this HoarderBugAI original, float time)
+        public static void StartDance(this HoarderBugAI original, float duration)
         {
-            float Amplitude = 2;
+            float startingY = 1.5863f;
+            original.StopAllCoroutines();
+            original.BecomeFriends(1);
+
+            original.StartCoroutine(original.Dance(duration, startingY));
+        }
+
+        public static IEnumerator<WaitForEndOfFrame> Dance(this HoarderBugAI original, float duration, float startY)
+        {
+            float Amplitude = 0.4f;
             float Frequency = Mathf.PI * 10f;
-
-            Transform spinTrans = original.gameObject.transform.Find("HoarderBugModel").Find("AnimContainer").Find("Armature");
-            Transform chestTrans = spinTrans.Find("Abdomen").Find("Chest");
-            Vector3 startRotation = spinTrans.localRotation.eulerAngles;
-
-            float startY = chestTrans.position.y;
-            while (time < 0)
+            Transform chestTrans = original.animationContainer.Find("Armature").Find("Abdomen").Find("Chest");
+            float time = 0;
+            HoardingBugSnacksMod.mls.LogMessage($"startY: {startY}");
+            while (time < duration)
             {
                 chestTrans.localPosition = new Vector3(
                     chestTrans.localPosition.x, 
                     startY + Mathf.Sin(time * Frequency) * Amplitude,
                     chestTrans.localPosition.z);
-
-                spinTrans.localRotation = Quaternion.Euler(startRotation.x, startRotation.y + time * 90f * Amplitude, startRotation.z);
-
                 time += Time.deltaTime;
                 yield return new WaitForEndOfFrame();
             }
+            chestTrans.localPosition = new Vector3(chestTrans.localPosition.x, startY, chestTrans.localPosition.z);
+
         }
     }
 }

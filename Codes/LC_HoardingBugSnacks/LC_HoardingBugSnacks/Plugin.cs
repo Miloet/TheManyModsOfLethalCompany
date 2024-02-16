@@ -11,7 +11,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Numerics;
 using LC_HoardingBugSnacks.Patches;
-
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace LC_HoardingBugSnacks
 {
@@ -28,14 +30,15 @@ namespace LC_HoardingBugSnacks
         private readonly Harmony harmony = new Harmony(modGUID);
 
         public static ManualLogSource mls;
-        private static HoardingBugSnacksMod instance;
+        public static HoardingBugSnacksMod instance;
 
         static string Name = "Hoarding Bug Snacks";
         static string Description = "";
 
         static ConfigEntry<int> price;
-
         public static Item shotgunItem;
+
+        public static EnemyType hoarderType;
 
         void Awake()
         {
@@ -72,14 +75,6 @@ namespace LC_HoardingBugSnacks
 
 
             #endregion
-
-            foreach(Item maybeShotgun in Resources.FindObjectsOfTypeAll(typeof(Item)))
-            {
-                if(maybeShotgun.itemName == "Shotgun") shotgunItem = maybeShotgun;
-            }
-
-            
-
 
             //Add to shop
             Items.RegisterItem(item);
