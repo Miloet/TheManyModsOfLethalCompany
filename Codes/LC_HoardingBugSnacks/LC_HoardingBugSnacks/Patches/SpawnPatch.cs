@@ -17,7 +17,7 @@ namespace LC_HoardingBugSnacks.Patches
 			int bugId = 2;
 			if (RoundManager.Instance.NetworkManager.IsHost || RoundManager.Instance.NetworkManager.IsServer)
 			{
-				for (int i = 0; i < 1 + Random.Range(0, 100); i++)
+				for (int i = 0; i < 1 + Random.Range(0, 10); i++)
 				{
 					RoundManager.Instance.SpawnEnemyServerRpc(
 							new Vector3(
@@ -34,14 +34,16 @@ namespace LC_HoardingBugSnacks.Patches
 
 		[HarmonyPatch(typeof(HoarderBugAI), "Start")]
 		[HarmonyPostfix]
-		public static void SpawnWithShotgun(Transform ___transform)
+		public static void SpawnWithShotgun(Transform ___animationContainer)
 		{
-			float chance = 1f;
-			if (chance < Random.Range(0f, 1f))
+			HoarderBugAI bug = ___animationContainer.parent.GetComponentInParent<HoarderBugAI>();
+			
+			if (bug == null) return;
+            float chance = 1f;
+			if (chance > Random.Range(0f, 1f))
 			{
 				var g = GameObject.Instantiate(HoardingBugSnacksMod.shotgunItem.spawnPrefab);
                 NetworkObject component = g.GetComponent<NetworkObject>();
-				var bug = ___transform.GetComponent<HoarderBugAI>();
                 bug.SwitchToBehaviourStateOnLocalClient(1);
                 bug.GrabItemServerRpc(component);
             }

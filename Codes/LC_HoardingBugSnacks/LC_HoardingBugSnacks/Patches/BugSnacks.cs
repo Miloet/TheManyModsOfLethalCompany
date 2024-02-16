@@ -30,6 +30,7 @@ namespace LC_HoardingBugSnacks.Patches
             if (buttonDown)
             {
                 playerHeldBy.playerBodyAnimator.SetTrigger("shakeItem");
+                MakeBugsDance(transform, 2, 10);
             }
         }
 
@@ -39,7 +40,7 @@ namespace LC_HoardingBugSnacks.Patches
             if (enemy != null && enemy is HoarderBugAI)
             {
                 var bug = (HoarderBugAI)enemy;
-                MakeBugsDance(bug, 10, 10);
+                MakeBugsDance(bug.transform, 10, 10);
                 BecomeFriends(bug, 15f, true);
             }
         }
@@ -54,15 +55,14 @@ namespace LC_HoardingBugSnacks.Patches
                     bug.BecomeFriends(friendAmount);
                 }
         }
-        public static void MakeBugsDance(HoarderBugAI mainBug, int time, float range)
+        public static void MakeBugsDance(Transform pos, int time, float range)
         {
-            Vector3 pos = mainBug.transform.position;
             if(range > 0.5f)
             {
                 var allBugs = FindObjectsOfType<HoarderBugAI>();
                 foreach(var bug in allBugs)
                 {
-                    if(Vector3.Distance(bug.transform.position, pos) < range) bug.StartCoroutine(bug.Dance(time));
+                    if(Vector3.Distance(bug.transform.position, pos.position) < range) bug.StartCoroutine(bug.Dance(time));
                 }
             }
 
