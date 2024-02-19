@@ -11,6 +11,8 @@ namespace LC_HoardingBugSnacks.Patches
 {
     public class BugSnacks : PhysicsProp
     {
+        public static float BugHappiness;
+
         public override void Start()
         {
             base.Start();
@@ -41,18 +43,18 @@ namespace LC_HoardingBugSnacks.Patches
             {
                 var bug = (HoarderBugAI)enemy;
                 MakeBugsDance(bug.transform, 10, 10);
-                BecomeFriends(bug, 15f, true);
+                BecomeFriends(bug, 15f, true, playerHeldBy);
             }
         }
 
-        public static void BecomeFriends(HoarderBugAI mainBug, float friendAmount, bool allBugs = true)
+        public static void BecomeFriends(HoarderBugAI mainBug, float friendAmount, bool allBugs = true, PlayerControllerB player = null)
         {
-            mainBug.BecomeFriends(friendAmount);
+            mainBug.BecomeFriends(friendAmount, player);
 
             if (allBugs)
                 foreach (HoarderBugAI bug in FindObjectsOfType<HoarderBugAI>())
                 {
-                    bug.BecomeFriends(friendAmount);
+                    bug.BecomeFriends(friendAmount, player);
                 }
         }
         public static void MakeBugsDance(Transform pos, int time, float range)
@@ -71,7 +73,7 @@ namespace LC_HoardingBugSnacks.Patches
 
     public static class ExtensionMethod
     {
-        public static void BecomeFriends(this HoarderBugAI original, float amount)
+        public static void BecomeFriends(this HoarderBugAI original, float amount, PlayerControllerB player = null)
         {
             Type type = typeof(HoarderBugAI);
 
@@ -86,14 +88,19 @@ namespace LC_HoardingBugSnacks.Patches
                 // Modify the value of the private field
                 field.SetValue(original, currentValue - amount);
             }
+
+            original.angryAtPlayer = null;
+            if(player != null) original.watchingPlayer = player;
             original.angryTimer -= amount;
+
+            BugSnacks.BugHappiness += amount;
         }
 
         public static void StartDance(this HoarderBugAI original, float duration)
         {
             float startingY = 1.5863f;
             original.StopAllCoroutines();
-            original.BecomeFriends(1);
+            original.BecomeFriends(.5f);
 
             original.StartCoroutine(original.Dance(duration, startingY));
         }
