@@ -109,6 +109,7 @@ namespace LC_Sandwich
                 RoundManager.Instance.PlayAudibleNoise(base.transform.position, 15f, 1.5f, 0, isInElevator && StartOfRound.Instance.hangarDoorsClosed);
                 if (base.IsOwner) SyncBatteryServerRpc(100);
                 DestroyObjectInHand(previousPlayerHeldBy);
+                enabled = false;
             }
         }
 
@@ -118,13 +119,13 @@ namespace LC_Sandwich
             {
                 //play funny sound
                 Stop();
+                SetScrapValue((int)Mathf.Lerp(0, originalValue, eaten));
                 previousPlayerHeldBy.health = Mathf.Clamp(previousPlayerHeldBy.health + healing, 0, 100);
                 HUDManager.Instance.UpdateHealthUI(previousPlayerHeldBy.health, false);
             }
             
             eaten = newValue;
             material.SetFloat("_Eating", eaten);
-            scrapValue = (int)Mathf.Lerp(0, originalValue, eaten);
         }
 
         public override void EquipItem()
