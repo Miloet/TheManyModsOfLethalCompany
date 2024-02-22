@@ -82,6 +82,8 @@ namespace LC_HoardingBugSnacks.Patches
 				var g = GameObject.Instantiate(HoardingBugSnacksMod.shotgunItem.spawnPrefab, __instance.transform.position, Quaternion.identity);
 				NetworkObject component = g.GetComponent<NetworkObject>();
 				var shotgun = g.GetComponent<ShotgunItem>();
+				var item = shotgun.itemProperties;
+                shotgun.SetScrapValue(Random.Range(item.minValue, item.maxValue)/4);
 				shotgun.shellsLoaded = 2;
 				shotgun.safetyOn = false;
 				component.Spawn();
@@ -89,13 +91,74 @@ namespace LC_HoardingBugSnacks.Patches
 				__instance.GrabItemServerRpc(component);
 			}
 		}
+		public static HoarderBugItem tempShotgun;
 
 		[HarmonyPatch(typeof(HoarderBugAI), "DropItem")]
 		[HarmonyPrefix]
 		public static void DontDropIfShotgun(HoarderBugAI __instance)
 		{
-			if (__instance.heldItem.itemGrabbableObject is ShotgunItem) return;
+            if (__instance.heldItem.itemGrabbableObject is ShotgunItem)
+			{
+				tempShotgun = __instance.heldItem;
+                __instance.heldItem = null;
+			}
 		}
 
-	}
+        [HarmonyPatch(typeof(HoarderBugAI), "DropItem")]
+        [HarmonyPostfix]
+        public static void PickBackUpIfShotgun(HoarderBugAI __instance)
+        {
+			if (__instance.heldItem == null && tempShotgun != null)
+			{
+				__instance.heldItem = tempShotgun;
+				tempShotgun = null;
+			}
+        }
+
+
+        [HarmonyPatch(typeof(HoarderBugAI), "IsHoarderBugAngry")]
+        [HarmonyPrefix]
+		public static bool MakeNotAngryWhenSnacks(HoarderBugAI __instance)
+		{
+			if(BugSnacks.BugHappiness > 0)
+			{
+                BugSnacks.BugHappiness -= Time.deltaTime;
+                return false;
+            }
+			else
+			{
+                if (__instance.stunNormalizedTimer > 0f)
+                {
+                    __instance.angryTimer = 4f;
+                    if (__instance.stunnedByPlayer)
+                    {
+                        __instance.angryAtPlayer = __instance.stunnedByPlayer;
+                    }
+                    return true;
+                }
+                int num = 0;
+                int num2 = 0;
+                for (int i = 0; i < HoarderBugAI.HoarderBugItems.Count; i++)
+                {
+                    if (HoarderBugAI.HoarderBugItems[i].status == HoarderBugItemStatus.Stolen)
+                    {
+                        num2++;
+                    }
+                    else if (HoarderBugAI.HoarderBugItems[i].status == HoarderBugItemStatus.Returned)
+                    {
+                        num++;
+                    }
+                }
+                if (!(__instance.angryTimer > 0f))
+                {
+                    return num2 > 0;
+                }
+                return true;
+            }
+
+		}
+
+
+
+    }
 }
