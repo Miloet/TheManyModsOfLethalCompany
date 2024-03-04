@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +15,11 @@ namespace LC_Sandwich
         public static int sandwichSize = 4; //Amount of times the sandwich can be eaten
         public static float timeToEat = 2f;
         public static int healing = 15;
+        public static float healCrippleChance = 1f / sandwichSize;
 
         public float eatingSpeed = 1f;
         private float eaten = 0; // 0 - 1 value describing how much of it has been eaten
-        private int originalValue;
+        private int originalValue = 0; 
 
         Material material;
         AudioSource audioSource;
@@ -44,7 +44,7 @@ namespace LC_Sandwich
             grabbable = true;
             
             useCooldown = 0.3f;
-            originalValue = scrapValue;
+            
             material = GetComponent<MeshRenderer>().material;
             material.SetInt("_Size", sandwichSize);
 
@@ -56,8 +56,10 @@ namespace LC_Sandwich
 
             itemProperties = originalProperties;
             insertedBattery = new Battery(false, 0f);
-        }
 
+            SetScrapValue(Random.Range(itemProperties.minValue, itemProperties.maxValue));
+            //originalValue = scrapValue;
+        }
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
@@ -96,36 +98,64 @@ namespace LC_Sandwich
             if (isHeld && previousPlayerHeldBy == StartOfRound.Instance.localPlayerController)
             {
                 insertedBattery.charge = eaten;
-                if (base.IsOwner) SyncBatteryServerRpc((int)(insertedBattery.charge * 100f));
+                SyncBatteryServerRpc((int)(eaten * 100f));
             }
             else
             {
-                eaten = insertedBattery.charge;
+                if(eaten != insertedBattery.charge)
+                    UpdateEating(insertedBattery.charge, true);
             }
              
             if (eaten >= 1)
             {
                 audioSource.PlayOneShot(finishSFX);
                 RoundManager.Instance.PlayAudibleNoise(base.transform.position, 15f, 1.5f, 0, isInElevator && StartOfRound.Instance.hangarDoorsClosed);
-                if (base.IsOwner) SyncBatteryServerRpc(100);
+                SyncBatteryServerRpc(100);
                 DestroyObjectInHand(previousPlayerHeldBy);
                 enabled = false;
             }
         }
 
-        public void UpdateEating(float newValue)
+        public void UpdateEating(float newValue, bool ignoreEating = false)
         {
-            if (Mathf.Floor(newValue * sandwichSize) / sandwichSize != Mathf.Floor(eaten * sandwichSize) / sandwichSize)
+            if (Mathf.Floor(newValue * sandwichSize) / sandwichSize != Mathf.Floor(eaten * sandwichSize) / sandwichSize && !ignoreEating)
             {
                 //play funny sound
                 Stop();
-                SetScrapValue((int)Mathf.Lerp(0, originalValue, eaten));
-                previousPlayerHeldBy.health = Mathf.Clamp(previousPlayerHeldBy.health + healing, 0, 100);
-                HUDManager.Instance.UpdateHealthUI(previousPlayerHeldBy.health, false);
+                SetScrapValue((int)Mathf.Lerp(0, originalValue, 1f - eaten));
+                StartCoroutine(HealPlayer());
             }
             
             eaten = newValue;
             material.SetFloat("_Eating", eaten);
+        }
+
+        public IEnumerator<WaitForEndOfFrame> HealPlayer()
+        {
+            float overDuration = eatingSpeed / 4f;
+            float time = 0f;
+
+            int starting = previousPlayerHeldBy.health;
+            int target = starting + healing;
+
+            float hp;
+
+            while(time < overDuration)
+            {
+                hp = Mathf.Lerp(starting, target, Mathf.InverseLerp(0,overDuration,time));
+
+                if(Mathf.CeilToInt(hp) != previousPlayerHeldBy.health)
+                {
+                    previousPlayerHeldBy.health = Mathf.CeilToInt(hp);
+                    HUDManager.Instance.UpdateHealthUI(previousPlayerHeldBy.health, false);
+                }
+
+                time += Time.deltaTime;
+                yield return null;
+            }
+
+            if (previousPlayerHeldBy.criticallyInjured && UnityEngine.Random.Range(0f, 1f) < healCrippleChance)
+                previousPlayerHeldBy.criticallyInjured = false;
         }
 
         public override void EquipItem()
@@ -134,6 +164,7 @@ namespace LC_Sandwich
             if (playerHeldBy != null)
             {
                 previousPlayerHeldBy = playerHeldBy;
+                if (originalValue == 0) originalValue = scrapValue;
             }
         }
         public override void DiscardItem()

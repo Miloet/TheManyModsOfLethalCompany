@@ -1,7 +1,7 @@
 ﻿{
-  "name": "Sandwich",
+  "name": "Plushie",
   "version_number": "1.0.1",
   "website_url": "https://github.com/Miloet/TheManyModsOfLethalCompany",
-  "description": "Adds an edible sandwich that can heal you as scrap",
+  "description": "Adds a giant raccoon plushie as scrap! (Model by: @Sweetstarfish84 on discord/twitter)",
   "dependencies": [ "BepInEx-BepInExPack-5.4.2100", "Evaisa-LethalLib-0.14.2", "Evaisa-HookGenPatcher-0.0.5" ]
 }

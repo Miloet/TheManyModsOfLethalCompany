@@ -10,33 +10,4 @@ Monster energy case (scrap)
 
 Hoarding bug plushie (high value scrap)
 
-(Hoarding) Bug snacks (equipment)
-	makes the hoarding bugs very friendly to the player
-	the bugs dance when given food (using hoarderbud)
-		(in lateupdate if the bug is carrying food it will have its canhearmusic bool set to true in its hoarderMusicFlag componant)
-public override void GrabItemFromEnemy(EnemyAI enemy)
-{
-	if(enemy is HoardingBugAI)
-	{
-		var bug = (HoardingBugAI)enemy;
-		bug.BecomeFriends(15f);
-	}
-}
-
-in a hoardingbug patch 
-	public void BecomeFriends(float friendAmount)
-	{
-		angryTimer -= friendAmount;
-		annoyanceMeter -= friendAmount;
-	}
-	public void BecomeFriendsWithAll(float friendAmount)
-	{	
-		foreach(HoardingBugAI bug in GetAllObjectOfType<HoardingBugAI>())
-			bug.BecomeFriends(friendAmount);
-	}
-
-Electric Emergency stim shot (EESS) (equipment)
-	heal a set amount of hp and has one use but can be recharged
-
-
 Comically large E-Pill bottle (high value scrap)

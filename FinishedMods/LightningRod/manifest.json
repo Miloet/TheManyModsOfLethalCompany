@@ -1,7 +1,7 @@
 ﻿{
-  "name": "Sandwich",
-  "version_number": "1.0.1",
+  "name": "LightningRod",
+  "version_number": "1.0.0",
   "website_url": "https://github.com/Miloet/TheManyModsOfLethalCompany",
-  "description": "Adds an edible sandwich that can heal you as scrap",
+  "description": "Adds a new ship upgrade that redirects lightning away from you and your coworkers to your big strong ship!",
   "dependencies": [ "BepInEx-BepInExPack-5.4.2100", "Evaisa-LethalLib-0.14.2", "Evaisa-HookGenPatcher-0.0.5" ]
 }

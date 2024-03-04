@@ -60,6 +60,8 @@ namespace LC_Sandwich
 
             Sandwich.sandwichSize = Config.Bind<int>("Properties", "Size", 4, "How many times can the sandwich be eaten").Value;
             Sandwich.healing = Config.Bind<int>("Properties", "Healing", 35, "How many hitpoints should be restored when one part is consumed").Value;
+            float chance = Config.Bind<float>("Properties", "Heal Critical-injury Chance", -1f, "The chance to heal the critical-injury state with each bite (between 0 - 1)(set to -1 if you want the chance to be based off sandwich size)").Value;
+            Sandwich.healCrippleChance = chance == -1 ? 1f / Sandwich.sandwichSize : chance;
             Sandwich.timeToEat = Config.Bind<int>("Properties", "Time", 2, "How long in seconds does it take to eat one part of the sandwich").Value;
 
 
