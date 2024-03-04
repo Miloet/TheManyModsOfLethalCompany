@@ -1,0 +1,13 @@
+Player extention method
+{
+	randomly change the moveInputVector by a sine curve based on time
+	player movement speed = base + base * caffeen level * extraSpeed
+}
+
+
+Harmony Patch the player update with moveInputVector = moveInputVector * Quarterinion(something based on character caffieene)
+
+in the MonsterEnergy class
+public static float caffieen level 
+
+

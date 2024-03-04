@@ -76,7 +76,7 @@ namespace LC_HoardingBugSnacks.Patches
 		[HarmonyPostfix]
 		public static void SpawnWithShotgun(HoarderBugAI __instance)
 		{
-			float chance = 1f;
+			float chance = 0.1f;
 			if (chance > Random.Range(0f, 1f))
 			{
 				var g = GameObject.Instantiate(HoardingBugSnacksMod.shotgunItem.spawnPrefab, __instance.transform.position, Quaternion.identity);
