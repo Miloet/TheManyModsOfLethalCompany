@@ -1,7 +1,7 @@
 ﻿{
   "name": "LightningRod",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/Miloet/TheManyModsOfLethalCompany",
   "description": "Adds a new ship upgrade that redirects lightning away from you and your coworkers to your big strong ship!",
-  "dependencies": [ "BepInEx-BepInExPack-5.4.2100", "Evaisa-LethalLib-0.14.2", "Evaisa-HookGenPatcher-0.0.5" ]
+  "dependencies": [ "BepInEx-BepInExPack-5.4.2100", "Evaisa-LethalLib-0.14.2", "Evaisa-HookGenPatcher-0.0.5", "Ozone-Runtime_Netcode_Patcher-0.2.5" ]
 }
