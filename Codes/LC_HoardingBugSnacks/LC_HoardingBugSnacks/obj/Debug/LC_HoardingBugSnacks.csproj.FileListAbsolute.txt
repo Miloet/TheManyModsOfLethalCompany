@@ -215,3 +215,4 @@ C:\Users\Miloe\OneDrive\Skrivbord\LethalCompanySchool\TheManyModsOfLethalCompany
 C:\Users\Miloe\OneDrive\Skrivbord\LethalCompanySchool\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\obj\Debug\LC_HoardingBugSnacks.csproj.CopyComplete
 C:\Users\Miloe\OneDrive\Skrivbord\LethalCompanySchool\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\obj\Debug\LC_HoardingBugSnacks.dll
 C:\Users\Miloe\OneDrive\Skrivbord\LethalCompanySchool\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\obj\Debug\LC_HoardingBugSnacks.pdb
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_HoardingBugSnacks\LC_HoardingBugSnacks\bin\Debug\NicholaScott.BepInEx.RuntimeNetcodeRPCValidator.dll
