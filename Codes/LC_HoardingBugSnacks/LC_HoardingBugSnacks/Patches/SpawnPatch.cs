@@ -20,7 +20,7 @@ namespace LC_HoardingBugSnacks.Patches
 		}
 
 
-		[HarmonyPatch(typeof(RoundManager), "LoadNewLevelWait")]
+        [HarmonyPatch(typeof(RoundManager), "LoadNewLevelWait")]
 		[HarmonyPostfix]
 		public static void SpawnExtraHoardingBugs(RoundManager __instance)
 		{
@@ -37,13 +37,17 @@ namespace LC_HoardingBugSnacks.Patches
 			yield return null;
 			yield return new WaitUntil(() => instance.playersFinishedGeneratingFloor.Count >= GameNetworkManager.Instance.connectedPlayers);
 			yield return new WaitForSeconds(5f);
-			for (int i = 0; i < 10; i++)
+			float x = Random.Range(-25f,25f);
+			float z = Random.Range(-25f, 25f);
+
+			int numToSpawn = HoardingBugSnacksMod.bugsToSpawn.Value + Random.Range(0, HoardingBugSnacksMod.randomBugsToSpawn.Value);
+            for (int i = 0; i < numToSpawn; i++)
 			{
 				instance.SpawnEnemyOnServer(
 						new Vector3(
-							-4.3f + Random.Range(-5f, 5f),
+							-4.3f + Random.Range(-5f, 5f) + x,
 							-219.5f,
-							66f + Random.Range(-5f, 5)),
+							66f + Random.Range(-5f, 5) + z),
 						0f,
 						2); //,HoardingBugSnacksMod.hoarderType);
 			}
@@ -76,7 +80,7 @@ namespace LC_HoardingBugSnacks.Patches
 		[HarmonyPostfix]
 		public static void SpawnWithShotgun(HoarderBugAI __instance)
 		{
-			float chance = 0.1f;
+			float chance = (float)HoardingBugSnacksMod.shotgunChance.Value / 100f;
 			if (chance > Random.Range(0f, 1f))
 			{
 				var g = GameObject.Instantiate(HoardingBugSnacksMod.shotgunItem.spawnPrefab, __instance.transform.position, Quaternion.identity);
@@ -97,10 +101,9 @@ namespace LC_HoardingBugSnacks.Patches
 		[HarmonyPrefix]
 		public static void DontDropIfShotgun(HoarderBugAI __instance)
 		{
-            if (__instance.heldItem.itemGrabbableObject is ShotgunItem)
+            if (__instance.heldItem != null && (__instance.heldItem.itemGrabbableObject is ShotgunItem || __instance.heldItem.itemGrabbableObject is BugSnacks))
 			{
 				tempShotgun = __instance.heldItem;
-                __instance.heldItem = null;
 			}
 		}
 
@@ -110,7 +113,7 @@ namespace LC_HoardingBugSnacks.Patches
         {
 			if (__instance.heldItem == null && tempShotgun != null)
 			{
-				__instance.heldItem = tempShotgun;
+				__instance.GrabItemServerRpc(tempShotgun.itemGrabbableObject.NetworkObject);
 				tempShotgun = null;
 			}
         }

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using GameNetcodeStuff;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace LC_HoardingBugSnacks.Patches
@@ -25,14 +26,13 @@ namespace LC_HoardingBugSnacks.Patches
             if (buttonDown)
             {
                 playerHeldBy.playerBodyAnimator.SetTrigger("shakeItem");
-                MakeBugsDance(transform, 1, 5);
+                MakeBugsDanceServerRpc(transform, 1, 5);
             }
         }
 
         public override void Update()
         {
             base.Update();
-            HoardingBugSnacksMod.mls.LogMessage("HOW HAPPY ARE THE BUGS: "+ BugHappiness);
         }
 
         public override void GrabItemFromEnemy(EnemyAI enemy)
@@ -41,8 +41,8 @@ namespace LC_HoardingBugSnacks.Patches
             if (enemy != null && enemy is HoarderBugAI)
             {
                 var bug = (HoarderBugAI)enemy;
-                MakeBugsDance(bug.transform, 10, 100);
-                BecomeFriends(bug, 120f, true, this, playerHeldBy);
+                MakeBugsDanceServerRpc(bug.transform, HoardingBugSnacksMod.danceTime.Value, 100);
+                BecomeFriends(bug, HoardingBugSnacksMod.friendlyTime.Value, true, this, playerHeldBy);
             }
         }
 
@@ -56,6 +56,21 @@ namespace LC_HoardingBugSnacks.Patches
                     bug.BecomeFriends(friendAmount, held, player);
                 }
         }
+        
+        [ServerRpc]
+        public static void MakeBugsDanceServerRpc(Transform pos, int time, float range)
+        {
+            MakeBugsDanceClientRpc(pos, time, range);
+        }
+        [ClientRpc]
+        public static void MakeBugsDanceClientRpc(Transform pos, int time, float range)
+        {
+            MakeBugsDance(pos, time, range);
+        }
+
+
+
+
         public static void MakeBugsDance(Transform pos, int time, float range)
         {
             if(range > 0.5f)
@@ -110,7 +125,6 @@ namespace LC_HoardingBugSnacks.Patches
             float Frequency = Mathf.PI * 10f;
             Transform chestTrans = original.animationContainer.Find("Armature").Find("Abdomen").Find("Chest");
             float time = 0;
-            HoardingBugSnacksMod.mls.LogMessage($"startY: {startY}");
             while (time < duration)
             {
                 chestTrans.localPosition = new Vector3(

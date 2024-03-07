@@ -14,10 +14,13 @@ using LC_HoardingBugSnacks.Patches;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using RuntimeNetcodeRPCValidator;
+using System.CodeDom;
 
 namespace LC_HoardingBugSnacks
 {
     [BepInPlugin(modGUID, modName, modVersion)]
+    [BepInDependency(RuntimeNetcodeRPCValidator.MyPluginInfo.PLUGIN_GUID, RuntimeNetcodeRPCValidator.MyPluginInfo.PLUGIN_VERSION)]
     public class HoardingBugSnacksMod : BaseUnityPlugin
     {
         private const string modGUID = "Mellowdy.HoardingBugSnacks";
@@ -28,6 +31,7 @@ namespace LC_HoardingBugSnacks
         private const string gameObjectName = "BugSnacks.prefab";
 
         private readonly Harmony harmony = new Harmony(modGUID);
+        private NetcodeValidator validator = new NetcodeValidator(modGUID);
 
         public static ManualLogSource mls;
         public static HoardingBugSnacksMod instance;
@@ -36,6 +40,11 @@ namespace LC_HoardingBugSnacks
         static string Description = "";
 
         static ConfigEntry<int> price;
+        public static ConfigEntry<int> friendlyTime;
+        public static ConfigEntry<int> danceTime;
+        public static ConfigEntry<int> bugsToSpawn;
+        public static ConfigEntry<int> randomBugsToSpawn;
+        public static ConfigEntry<int> shotgunChance;
         public static Item shotgunItem;
 
         public static EnemyType hoarderType;
@@ -48,12 +57,18 @@ namespace LC_HoardingBugSnacks
 
             harmony.PatchAll(typeof(SpawnPatch));
             harmony.PatchAll();
+            validator.PatchAll();
 
             #region Set up item
 
             //Assign Config Settings
 
-            price = Config.Bind<int>("Price", "Snacks Price", 5, "Seals needed to buy the Seals");
+            price = Config.Bind<int>("Item", "Price", 5, "");
+            friendlyTime = Config.Bind<int>("Item", "Friendliness", 120, "How long are the bugs friendly for? (in seconds)");
+            danceTime = Config.Bind<int>("Item", "Dance", 10, "How long should the bugs dance for? (in seconds)");
+            bugsToSpawn = Config.Bind<int>("Bugs", "Spawn Always", 1, "How many bugs should always spawn at the start of a round");
+            randomBugsToSpawn = Config.Bind<int>("Bugs", "Spawn Random", 3, "How many bugs extra bugs CAN randomly spawn in addition to the guaranteed bugs");
+            shotgunChance = Config.Bind<int>("Bugs", "Shotgun chance", 10, "Chance for bug to spawn with a shotgun (100 = 100%) (they found the US constitution and really liked the second part)");
 
             //Asset Bundle
 
