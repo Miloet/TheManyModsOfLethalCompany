@@ -20,3 +20,13 @@ C:\Users\Miloe\OneDrive\Skrivbord\LethalCompanySchool\TheManyModsOfLethalCompany
 C:\Users\Miloe\OneDrive\Skrivbord\LethalCompanySchool\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\obj\Debug\LC_LethalEnergy.csproj.CopyComplete
 C:\Users\Miloe\OneDrive\Skrivbord\LethalCompanySchool\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\obj\Debug\LC_LethalEnergy.dll
 C:\Users\Miloe\OneDrive\Skrivbord\LethalCompanySchool\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\obj\Debug\LC_LethalEnergy.pdb
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\bin\Debug\LC_LethalEnergy.dll
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\bin\Debug\LC_LethalEnergy.pdb
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\bin\Debug\UnityEngine.AudioModule.dll
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\bin\Debug\netstandard.dll
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\bin\Debug\UnityEngine.SharedInternalsModule.dll
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\obj\Debug\LC_LethalEnergy.csproj.AssemblyReference.cache
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\obj\Debug\LC_LethalEnergy.csproj.CoreCompileInputs.cache
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\obj\Debug\LC_LethalEnergy.csproj.CopyComplete
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\obj\Debug\LC_LethalEnergy.dll
+C:\Users\milo.zanderfrenell\Documents\GitHub\TheManyModsOfLethalCompany\Codes\LC_LethalEnergy\LC_LethalEnergy\obj\Debug\LC_LethalEnergy.pdb

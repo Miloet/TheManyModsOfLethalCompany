@@ -157,9 +157,15 @@ namespace LC_LethalEnergy
                 }
                 else Caffeine -= Time.deltaTime / DecayRate;
 
-                if(Caffeine > 4f)
+
+                if (Caffeine > 3f)
                 {
-                    __instance.health = 0;
+                    __instance.DamagePlayer(10, true, true, CauseOfDeath.Crushing, 1, false, default(Vector3));
+                    HUDManager.Instance.DisplayTip("Warning", "High caffeine blood content", true);
+                }
+                if (Caffeine > 4f)
+                {
+                    __instance.DamagePlayer(9999,true,true,CauseOfDeath.Crushing,1, false, default(Vector3));
                 }
 
 

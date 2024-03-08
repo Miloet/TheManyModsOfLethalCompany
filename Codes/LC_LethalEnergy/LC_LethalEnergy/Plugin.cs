@@ -24,8 +24,8 @@ namespace LC_LethalEnergy
         private static LethalEnergyMod instance;
         public static AssetBundle assets;
 
-        public static string assetName = "sandwich.asset";
-        public static string canPrefabName = "Sandwich.prefab";
+        public static string assetName = "monster.energy";
+        public static string canPrefabName = "monstercan.prefab";
         public static string casePrefabName = ".prefab";
 
         void Awake()
@@ -40,10 +40,18 @@ namespace LC_LethalEnergy
 
             //Plushie Scrap Item
             //GameObject Case = assets.LoadAsset<GameObject>(casePrefabName);
+
             GameObject Can = assets.LoadAsset<GameObject>(canPrefabName);
+            mls.LogMessage(Can != null ? Can.name : "CAN IS NULL. FUCK YOU");
+
+            //DEBUG! REMOVE LATER!!!!!
+            Can.layer = LayerMask.NameToLayer("Props");
+            Can.tag = "PhysicsProp";
+
+            Can.AddComponent<AudioSource>();
 
 
-            Item canItem = assets.LoadAsset<Item>("Sandwich.asset");
+            Item canItem = assets.LoadAsset<Item>("can.asset");
             canItem.spawnPrefab = Can;
             canItem.itemName = "Can";
 

@@ -40,20 +40,30 @@ namespace LC_HoardingBugSnacks.Patches
 			float x = Random.Range(-25f,25f);
 			float z = Random.Range(-25f, 25f);
 
+			Vector3 spawnPos = new Vector3(
+							-4.3f + Random.Range(-5f, 5f) + x,
+							-219.5f,
+							66f + Random.Range(-5f, 5) + z);
+			Vector3 realSpawnPos = ChooseClosestNodeToPosition(spawnPos).position;
+
 			int numToSpawn = HoardingBugSnacksMod.bugsToSpawn.Value + Random.Range(0, HoardingBugSnacksMod.randomBugsToSpawn.Value);
             for (int i = 0; i < numToSpawn; i++)
 			{
-				instance.SpawnEnemyOnServer(
-						new Vector3(
-							-4.3f + Random.Range(-5f, 5f) + x,
-							-219.5f,
-							66f + Random.Range(-5f, 5) + z),
+				instance.SpawnEnemyOnServer(realSpawnPos,
 						0f,
 						2); //,HoardingBugSnacksMod.hoarderType);
 			}
 		}
 
-		[HarmonyPatch(typeof(StartOfRound), "Awake")]
+        public static Transform ChooseClosestNodeToPosition(Vector3 pos)
+        {
+            GameObject[] allAINodes = GameObject.FindGameObjectsWithTag("AINode");
+            var nodesTempArray = allAINodes.OrderBy((GameObject x) => Vector3.Distance(pos, x.transform.position)).ToArray();
+            Transform result = nodesTempArray[0].transform;
+            return result;
+        }
+
+        [HarmonyPatch(typeof(StartOfRound), "Awake")]
 		[HarmonyPostfix]
 		private static void SetHoarderType(StartOfRound __instance)
 		{
