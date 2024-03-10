@@ -44,7 +44,15 @@ namespace LC_HoardingBugSnacks.Patches
 							-4.3f + Random.Range(-5f, 5f) + x,
 							-219.5f,
 							66f + Random.Range(-5f, 5) + z);
-			Vector3 realSpawnPos = ChooseClosestNodeToPosition(spawnPos).position;
+			Transform node;
+			do
+			{
+				node = ChooseClosestNodeToPosition(spawnPos);
+
+				yield return new WaitForSeconds(1f);
+				
+			} while(node == null);
+			Vector3 realSpawnPos = node.position;
 
 			int numToSpawn = HoardingBugSnacksMod.bugsToSpawn.Value + Random.Range(0, HoardingBugSnacksMod.randomBugsToSpawn.Value);
             for (int i = 0; i < numToSpawn; i++)
@@ -57,9 +65,9 @@ namespace LC_HoardingBugSnacks.Patches
 
         public static Transform ChooseClosestNodeToPosition(Vector3 pos)
         {
-            GameObject[] allAINodes = GameObject.FindGameObjectsWithTag("AINode");
-            var nodesTempArray = allAINodes.OrderBy((GameObject x) => Vector3.Distance(pos, x.transform.position)).ToArray();
-            Transform result = nodesTempArray[0].transform;
+			GameObject[] allAINodes = GameObject.FindGameObjectsWithTag("AINode");
+			var nodesTempArray = allAINodes.OrderBy((GameObject x) => Vector3.Distance(pos, x.transform.position)).ToArray();
+			Transform result = nodesTempArray.First<GameObject>().transform;
             return result;
         }
 
