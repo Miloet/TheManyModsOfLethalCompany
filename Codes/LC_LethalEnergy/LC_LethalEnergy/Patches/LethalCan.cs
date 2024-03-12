@@ -81,36 +81,39 @@ namespace LC_LethalEnergy
         public override void Update()
         {
             base.Update();
-
-            if (previousPlayerHeldBy.playerBodyAnimator.GetBool(DrinkAnimation)) animationLerp = Mathf.MoveTowards(animationLerp, 1f, Time.deltaTime*3f / timeToStart);
-            else animationLerp = Mathf.MoveTowards(animationLerp, 0f, Time.deltaTime*3f / timeToStart);
-
-            animationLerp = Mathf.Clamp01(animationLerp);
-
-            //LethalEnergyMod.mls.LogMessage(animationLerp);
-
-            if (animationLerp > 0f) ChangeItem(drinkingProp);
-            else ChangeItem(normalProp);
-
-            if (itemProperties == drinkingProp)
+            if (isHeld)
             {
-                drinkingProp.positionOffset = Vector3.Lerp(normalPos, drinkingPos, animationLerp);
-                drinkingProp.rotationOffset = Vector3.Lerp(normalRot, drinkingRot, animationLerp);
-            }
 
+                if (previousPlayerHeldBy.playerBodyAnimator.GetBool(DrinkAnimation)) animationLerp = Mathf.MoveTowards(animationLerp, 1f, Time.deltaTime * 3f / timeToStart);
+                else animationLerp = Mathf.MoveTowards(animationLerp, 0f, Time.deltaTime * 3f / timeToStart);
 
-            if (drinking)
-            {
-                if (previousPlayerHeldBy == null || !isHeld || fill <= 0f)
+                animationLerp = Mathf.Clamp01(animationLerp);
+
+                //LethalEnergyMod.mls.LogMessage(animationLerp);
+
+                if (animationLerp > 0f) ChangeItem(drinkingProp);
+                else ChangeItem(normalProp);
+
+                if (itemProperties == drinkingProp)
                 {
-                    Stop();
-                    itemUsedUp = true;
-                    //audio.Stop();
+                    drinkingProp.positionOffset = Vector3.Lerp(normalPos, drinkingPos, animationLerp);
+                    drinkingProp.rotationOffset = Vector3.Lerp(normalRot, drinkingRot, animationLerp);
                 }
-                //previousPlayerHeldBy.
-                fill -= Time.deltaTime / timeToDrink;
-                PlayerPatches.Caffeine += Time.deltaTime / timeToDrink;
-                PlayerPatches.Duration += duration * Time.deltaTime / timeToDrink;
+
+
+                if (drinking)
+                {
+                    if (previousPlayerHeldBy == null || !isHeld || fill <= 0f)
+                    {
+                        Stop();
+                        itemUsedUp = true;
+                        //audio.Stop();
+                    }
+                    //previousPlayerHeldBy.
+                    fill -= Time.deltaTime / timeToDrink;
+                    PlayerPatches.Caffeine += Time.deltaTime / timeToDrink;
+                    PlayerPatches.Duration += duration * Time.deltaTime / timeToDrink;
+                }
             }
         }
 

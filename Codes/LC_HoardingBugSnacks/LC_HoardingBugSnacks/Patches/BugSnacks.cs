@@ -9,15 +9,18 @@ using GameNetcodeStuff;
 using Unity.Netcode;
 using UnityEngine;
 
+
 namespace LC_HoardingBugSnacks.Patches
 {
     public class BugSnacks : GrabbableObject
     {
         public static float BugHappiness;
-
+        AudioSource audio;
+        public AudioClip shake;
         public override void Start()
         {
             base.Start();
+            audio = GetComponent<AudioSource>();
         }
 
         public override void ItemActivate(bool used, bool buttonDown = true)
@@ -25,6 +28,7 @@ namespace LC_HoardingBugSnacks.Patches
             base.ItemActivate(used, buttonDown);
             if (buttonDown)
             {
+                audio.PlayOneShot(shake);
                 playerHeldBy.playerBodyAnimator.SetTrigger("shakeItem");
                 MakeBugsDanceServerRpc(transform, 1, 5);
             }

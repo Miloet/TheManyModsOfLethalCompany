@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using RuntimeNetcodeRPCValidator;
+using System;
 
 namespace LC_LethalEnergy
 {
@@ -29,7 +30,7 @@ namespace LC_LethalEnergy
 
         public static string assetName = "monster.energy";
         public static string canPrefabName = "monstercan.prefab";
-        public static string casePrefabName = ".prefab";
+        public static string casePrefabName = "monstercase.prefab";
 
         void Awake()
         {
@@ -40,28 +41,39 @@ namespace LC_LethalEnergy
             string currentDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             string path = Path.Combine(currentDirectory, assetName).Replace("\\", "/");
             assets = AssetBundle.LoadFromFile(path);
+            /*
+            foreach(string s in assets.GetAllAssetNames())
+                mls.LogMessage(s);
+            */
+
+
+            //Case
 
             GameObject Case = assets.LoadAsset<GameObject>(casePrefabName);
-            
+            Item caseItem = assets.LoadAsset<Item>("case.asset");
+            caseItem.spawnPrefab = Case;
+
+            DrinkCase drinkCase = Case.AddComponent<DrinkCase>();
+            drinkCase.itemProperties = caseItem;
+            drinkCase.grabbable = true;
+
+            //Can
 
             GameObject Can = assets.LoadAsset<GameObject>(canPrefabName);
-
             Item canItem = assets.LoadAsset<Item>("Can.asset");
             canItem.spawnPrefab = Can;
-            canItem.itemName = "Can";
 
             LethalCan lethalCan = Can.AddComponent<LethalCan>();
             lethalCan.itemProperties = canItem;
             lethalCan.grabbable = true;
             lethalCan.drinkingProp = assets.LoadAsset<Item>("Drinking.asset");
 
+            DrinkCase.canPrefab = Can;
+
+            NetworkPrefabs.RegisterNetworkPrefab(caseItem.spawnPrefab);
+            Items.RegisterScrap(caseItem,100);
             NetworkPrefabs.RegisterNetworkPrefab(canItem.spawnPrefab);
-            Items.RegisterScrap(canItem);
-
-
-            Case.AddComponent<DrinkCase>();
-            DrinkCase.canPrefab = Case;
-
+            Items.RegisterScrap(canItem,0);
 
             harmony.PatchAll();
             harmony.PatchAll(typeof(PlayerPatches));

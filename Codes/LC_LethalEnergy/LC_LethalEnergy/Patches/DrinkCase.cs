@@ -6,6 +6,8 @@ using GameNetcodeStuff;
 using HarmonyLib;
 using Unity.Netcode;
 using System.Collections;
+using System.Runtime.Remoting.Channels;
+using BepInEx.Logging;
 
 namespace LC_LethalEnergy
 {
@@ -15,32 +17,57 @@ namespace LC_LethalEnergy
 
         public int cansHeld;
 
+		public Transform[] cans;
 
+		public ManualLogSource mls;
+
+		int baseCans = 5;
+
+        public override void Start()
+        {
+            base.Start();
+			mls = LethalEnergyMod.mls;
+			GameObject g = transform.Find("DrinkContainer").gameObject;
+
+			cans = new Transform[g.transform.childCount];
+            for (int i = 0; i < g.transform.childCount; i++)
+            {
+                // Add each child's GameObject to the list
+                cans[i] = g.transform.GetChild(i);
+            }
+            LethalEnergyMod.mls.LogMessage(cans.Length);
+			cansHeld = 4;//Random.Range(baseCans, 12);
+			UpdateCans();
+        }
 
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
 
-            if (buttonDown)
+            if (buttonDown && cansHeld > 0)
             {
-				SpawnCanServerRpc();
+                cansHeld--;
+                UpdateCans();
+                SpawnCanServerRpc();
             }
         }
 
 
 		public void UpdateCans()
         {
+			cansHeld = Mathf.Clamp(cansHeld, 0, cans.Length);
+			for(int i = 0; i < cans.Length; i++)
+			{
+				LethalEnergyMod.mls.LogMessage($"{i} : {cansHeld} : {i < cansHeld}");
 
+				cans[i].gameObject.SetActive(i < cansHeld);
+			}
         }
-
 
 
 		[ServerRpc(RequireOwnership = false)]
 		public void SpawnCanServerRpc()
         {
-			cansHeld--;
-			UpdateCans();
-
 			#region Networking Stuff
 
 			Transform parent = ((((!(playerHeldBy != null) || !playerHeldBy.isInElevator) && !StartOfRound.Instance.inShipPhase) || !(RoundManager.Instance.spawnedScrapContainer != null)) ? StartOfRound.Instance.elevatorTransform : RoundManager.Instance.spawnedScrapContainer);

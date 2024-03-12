@@ -83,11 +83,12 @@ namespace LC_HoardingBugSnacks
             GameObject Object = assets.LoadAsset<GameObject>(gameObjectName);
             var bugSnacks = Object.AddComponent<BugSnacks>();
 
+            bugSnacks.useCooldown = 1f;
             bugSnacks.itemProperties = item;
             bugSnacks.grabbable = true;
             bugSnacks.grabbableToEnemies = true;
 
-
+            bugSnacks.shake = assets.LoadAsset<AudioClip>("shake.wav");
 
             #endregion
 
