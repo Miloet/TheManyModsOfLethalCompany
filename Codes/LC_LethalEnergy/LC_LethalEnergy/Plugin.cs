@@ -31,6 +31,23 @@ namespace LC_LethalEnergy
         public static string assetName = "monster.energy";
         public static string canPrefabName = "monstercan.prefab";
         public static string casePrefabName = "monstercase.prefab";
+        public static string drinkSoundName = "drinking.wav";
+
+
+
+        #region Settings
+
+
+
+        public void DoSettings()
+        {
+
+        }
+
+
+        #endregion
+
+
 
         void Awake()
         {
@@ -41,11 +58,6 @@ namespace LC_LethalEnergy
             string currentDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             string path = Path.Combine(currentDirectory, assetName).Replace("\\", "/");
             assets = AssetBundle.LoadFromFile(path);
-            /*
-            foreach(string s in assets.GetAllAssetNames())
-                mls.LogMessage(s);
-            */
-
 
             //Case
 
@@ -69,6 +81,8 @@ namespace LC_LethalEnergy
             lethalCan.drinkingProp = assets.LoadAsset<Item>("Drinking.asset");
 
             DrinkCase.canPrefab = Can;
+
+            LethalCan.drinkingSFX = assets.LoadAsset<AudioClip>(drinkSoundName);
 
             NetworkPrefabs.RegisterNetworkPrefab(caseItem.spawnPrefab);
             Items.RegisterScrap(caseItem,100);

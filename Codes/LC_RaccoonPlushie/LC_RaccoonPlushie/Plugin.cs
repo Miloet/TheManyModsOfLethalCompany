@@ -12,7 +12,7 @@ public class RaccoonPlushieMod : BaseUnityPlugin
 {
     private const string modGUID = "Mellowdy.RaccoonPlushie";
     private const string modName = "RaccoonPlushie";
-    private const string modVersion = "0.0.1";
+    private const string modVersion = "1.0.2";
 
 
     private readonly Harmony harmony = new Harmony(modGUID);
@@ -49,17 +49,12 @@ public class RaccoonPlushieMod : BaseUnityPlugin
         plushieItem.minValue = Config.Bind<int>("Raccoon Properties", "Min Value", plushieItem.minValue, "").Value;
         plushieItem.maxValue = Config.Bind<int>("Raccoon Properties", "Max Value", plushieItem.maxValue, "").Value;
         
-        
-
-
-
         var rac = plushieItem.spawnPrefab.AddComponent<Raccoon>();
         rac.grabbable = true;
         rac.grabbableToEnemies = true;
         rac.useCooldown = 0.25f;
-        rac.sounds = new AudioClip[] {
-            assets.LoadAsset<AudioClip>("Squeak1.mp3"), 
-            assets.LoadAsset<AudioClip>("Squeak2.mp3")};
+
+        LoadAudio();
 
         rac.itemProperties = plushieItem;
 
@@ -106,6 +101,12 @@ public class RaccoonPlushieMod : BaseUnityPlugin
         Items.RegisterScrap(plushieItem, rarity, Levels.LevelTypes.Modded);
 
         mls.LogInfo($"{modName} has been loaded");
+    }
+
+
+    public static void LoadAudio()
+    {
+        Raccoon.SetAudio(new AudioClip[] { assets.LoadAsset<AudioClip>("RaccoonSqueak1.mp3"), assets.LoadAsset<AudioClip>("RaccoonSqueak2.mp3") });
     }
 }
 

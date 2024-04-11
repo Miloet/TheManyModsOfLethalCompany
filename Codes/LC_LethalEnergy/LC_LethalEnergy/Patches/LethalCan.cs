@@ -38,6 +38,10 @@ namespace LC_LethalEnergy
         private const int baseValue = 8;
         private const int emptyValue = 1;
 
+
+
+        public static AudioClip drinkingSFX;
+
         public override void Start()
         {
             SetScrapValue(baseValue);
@@ -81,10 +85,10 @@ namespace LC_LethalEnergy
         public override void Update()
         {
             base.Update();
-            if (isHeld)
+            if (isHeld && playerHeldBy == StartOfRound.Instance.localPlayerController)
             {
-
-                if (previousPlayerHeldBy.playerBodyAnimator.GetBool(DrinkAnimation)) animationLerp = Mathf.MoveTowards(animationLerp, 1f, Time.deltaTime * 3f / timeToStart);
+                LethalEnergyMod.mls.LogMessage(animationLerp > 0f);
+                if (playerHeldBy.playerBodyAnimator.GetBool(DrinkAnimation)) animationLerp = Mathf.MoveTowards(animationLerp, 1f, Time.deltaTime * 3f / timeToStart);
                 else animationLerp = Mathf.MoveTowards(animationLerp, 0f, Time.deltaTime * 3f / timeToStart);
 
                 animationLerp = Mathf.Clamp01(animationLerp);
@@ -132,6 +136,7 @@ namespace LC_LethalEnergy
             ChangeItem(drinkingProp);
             yield return new WaitForSeconds(timeToStart);
             drinking = true;
+            audio.PlayOneShot(drinkingSFX);
 
             ////audio.PlayOneShot(twistCanSFX);
         }

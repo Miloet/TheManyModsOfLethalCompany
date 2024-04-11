@@ -23,6 +23,8 @@ namespace LC_LethalEnergy
 
 		int baseCans = 5;
 
+		int value = 0;
+
         public override void Start()
         {
             base.Start();
@@ -35,12 +37,38 @@ namespace LC_LethalEnergy
                 // Add each child's GameObject to the list
                 cans[i] = g.transform.GetChild(i);
             }
-            LethalEnergyMod.mls.LogMessage(cans.Length);
-			cansHeld = 4;//Random.Range(baseCans, 12);
-			UpdateCans();
+			StartCoroutine(SetValue());
+
+			if (IsServer || IsHost)
+				SetCansServerRpc(cansHeld = Random.Range(baseCans, 12));
         }
 
-        public override void ItemActivate(bool used, bool buttonDown = true)
+
+		public IEnumerator SetValue()
+        {
+			yield return new WaitForSeconds(1f);
+			value = scrapValue;
+
+			SetScrapValue(value + cansHeld * 10);
+		}
+
+		
+		[ServerRpc(RequireOwnership = true)]
+		public void SetCansServerRpc(int cans)
+        {
+			SetCansClientRpc(cans);
+
+		}
+		[ClientRpc]
+		public void SetCansClientRpc(int cans)
+		{
+			cansHeld = cans;
+			UpdateCans();
+		}
+
+
+
+		public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
 
@@ -55,14 +83,16 @@ namespace LC_LethalEnergy
 
 		public void UpdateCans()
         {
+			if (value != 0)
+				SetScrapValue(value + cansHeld * 12);
+
 			cansHeld = Mathf.Clamp(cansHeld, 0, cans.Length);
 			for(int i = 0; i < cans.Length; i++)
 			{
-				LethalEnergyMod.mls.LogMessage($"{i} : {cansHeld} : {i < cansHeld}");
-
 				cans[i].gameObject.SetActive(i < cansHeld);
 			}
-        }
+			if (cansHeld == 0) itemUsedUp = true;
+		}
 
 
 		[ServerRpc(RequireOwnership = false)]

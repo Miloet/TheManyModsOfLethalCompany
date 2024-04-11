@@ -5,7 +5,7 @@ using UnityEngine;
 public class Raccoon : GrabbableObject
 {
     private Animator animator;
-    public AudioClip[] sounds;
+    private static AudioClip[] sounds;
     private AudioSource audio;
 
     public override void Start()
@@ -28,4 +28,11 @@ public class Raccoon : GrabbableObject
         audio.PlayOneShot(sounds[Random.Range(0, sounds.Length)]);
         RoundManager.Instance.PlayAudibleNoise(base.transform.position, 5f, 0.4f, 0, isInElevator && StartOfRound.Instance.hangarDoorsClosed);
     }
+
+
+    public static void SetAudio(AudioClip[] audio)
+    {
+        sounds = audio;
+    }
+
 }

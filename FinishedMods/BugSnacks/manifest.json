@@ -1,0 +1,7 @@
+﻿{
+  "name": "HappyHoarders",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/Miloet/TheManyModsOfLethalCompany",
+  "description": "Adds new equipment to help sedate hoarding bugs!",
+  "dependencies": [ "BepInEx-BepInExPack-5.4.2100", "Evaisa-LethalLib-0.14.2", "Evaisa-HookGenPatcher-0.0.5", "Ozone-Runtime_Netcode_Patcher-0.2.5", "NiceHairs-Symbiosis-1.0.5" ]
+}

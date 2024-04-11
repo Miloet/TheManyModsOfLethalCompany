@@ -25,7 +25,7 @@ namespace LC_HoardingBugSnacks
     {
         private const string modGUID = "Mellowdy.HoardingBugSnacks";
         private const string modName = "HoardingBugSnacks";
-        private const string modVersion = "0.0.1";
+        private const string modVersion = "1.0.1";
 
         private const string assetName = "bug.snack";
         private const string gameObjectName = "BugSnacks.prefab";
@@ -37,7 +37,7 @@ namespace LC_HoardingBugSnacks
         public static HoardingBugSnacksMod instance;
 
         static string Name = "Hoarding Bug Snacks";
-        static string Description = "";
+        static string Description = "Use to sedate the common hoarding bug by means of peace offering.";
 
         static ConfigEntry<int> price;
         public static ConfigEntry<int> friendlyTime;
@@ -63,8 +63,8 @@ namespace LC_HoardingBugSnacks
 
             //Assign Config Settings
 
-            price = Config.Bind<int>("Item", "Price", 5, "");
-            friendlyTime = Config.Bind<int>("Item", "Friendliness", 120, "How long are the bugs friendly for? (in seconds)");
+            price = Config.Bind<int>("Item", "Price", 10, "");
+            friendlyTime = Config.Bind<int>("Item", "Friendliness", 60, "How long are the bugs friendly for? (in seconds)");
             danceTime = Config.Bind<int>("Item", "Dance", 10, "How long should the bugs dance for? (in seconds)");
             bugsToSpawn = Config.Bind<int>("Bugs", "Spawn Always", 1, "How many bugs should always spawn at the start of a round");
             randomBugsToSpawn = Config.Bind<int>("Bugs", "Spawn Random", 3, "How many bugs extra bugs CAN randomly spawn in addition to the guaranteed bugs");
