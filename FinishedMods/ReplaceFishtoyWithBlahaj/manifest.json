@@ -1,0 +1,7 @@
+﻿{
+  "name": "Blahaj",
+  "version_number": "1.0.6",
+  "website_url": "https://github.com/Miloet/LC_Bl-haj",
+  "description": "This mod replaces the Plastic Fishtoy with the IKEA Blahaj!",
+  "dependencies": [ "BepInEx-BepInExPack-5.4.2100" ]
+}

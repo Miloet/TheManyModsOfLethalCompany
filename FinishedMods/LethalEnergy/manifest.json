@@ -1,0 +1,7 @@
+﻿{
+  "name": "LethalEnergy",
+  "version_number": "1.1.1",
+  "website_url": "https://github.com/Miloet/TheManyModsOfLethalCompany",
+  "description": "Adds energy drinks as scrap to the moons that can be used to gain temporary speed! (can also be purchased)",
+  "dependencies": [ "BepInEx-BepInExPack-5.4.2100", "Evaisa-LethalLib-0.15.1", "Evaisa-HookGenPatcher-0.0.5", "Ozone-Runtime_Netcode_Patcher-0.2.5" ]
+}

@@ -1,0 +1,7 @@
+﻿{
+  "name": "ExtensionLadderFix",
+  "version_number": "0.0.1",
+  "website_url": "https://github.com/Miloet/TheManyModsOfLethalCompany",
+  "description": "Makes the extension ladder easier to place and makes sure it doesnt clip through the map",
+  "dependencies": [ "BepInEx-BepInExPack-5.4.2100", "Evaisa-LethalLib-0.15.1", "Evaisa-HookGenPatcher-0.0.5" ]
+}

@@ -1,0 +1,7 @@
+﻿{
+  "name": "CruiserTunes",
+  "version_number": "1.2.1",
+  "website_url": "https://github.com/Miloet/TheManyModsOfLethalCompany",
+  "description": "Allows the use of custom music for the Company Cruiser radio (also adds other QoL config settings to the radio)",
+  "dependencies": [ "BepInEx-BepInExPack-5.4.2100"]
+}

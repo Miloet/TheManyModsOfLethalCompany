@@ -34,7 +34,8 @@
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\..\LC References\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\LC References\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx">
@@ -43,7 +44,8 @@
     <Reference Include="LethalLib">
       <HintPath>..\..\..\..\..\LC References\LethalLib.dll</HintPath>
     </Reference>
-    <Reference Include="NicholaScott.BepInEx.RuntimeNetcodeRPCValidator">
+    <Reference Include="NicholaScott.BepInEx.RuntimeNetcodeRPCValidator, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\LC References\NicholaScott.BepInEx.RuntimeNetcodeRPCValidator.dll</HintPath>
     </Reference>
     <Reference Include="System" />

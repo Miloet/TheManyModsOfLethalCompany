@@ -1,0 +1,7 @@
+﻿{
+  "name": "Maxwell",
+  "version_number": "1.0.1",
+  "website_url": "https://github.com/Miloet/LC_Maxwell",
+  "description": "This mod replaces the Big Bolt with famous internet cat Maxwell",
+  "dependencies": ["BepInEx-BepInExPack-5.4.2100"]
+}

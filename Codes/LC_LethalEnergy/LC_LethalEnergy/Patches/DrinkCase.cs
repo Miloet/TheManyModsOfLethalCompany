@@ -6,13 +6,14 @@ using GameNetcodeStuff;
 using HarmonyLib;
 using Unity.Netcode;
 using System.Collections;
-using System.Runtime.Remoting.Channels;
+using RuntimeNetcodeRPCValidator;
 using BepInEx.Logging;
+using System;
 
 namespace LC_LethalEnergy
 {
-    public class DrinkCase : GrabbableObject
-    {
+    public class DrinkCase : GrabbableObject 
+	{
         public static GameObject canPrefab;
 
         public int cansHeld;
@@ -21,114 +22,90 @@ namespace LC_LethalEnergy
 
 		public ManualLogSource mls;
 
-		int baseCans = 5;
-
+		int minimumCans = 5;
 		int value = 0;
+		public bool loaded = false;
 
-        public override void Start()
-        {
-            base.Start();
+		public CanHandler canHandler;
+		public override void Start()
+        { 
+			base.Start();
 			mls = LethalEnergyMod.mls;
+
 			GameObject g = transform.Find("DrinkContainer").gameObject;
+			
 
 			cans = new Transform[g.transform.childCount];
-            for (int i = 0; i < g.transform.childCount; i++)
-            {
-                // Add each child's GameObject to the list
-                cans[i] = g.transform.GetChild(i);
-            }
+			for (int i = 0; i < g.transform.childCount; i++)
+			{
+				// Add each child's GameObject to the list
+				cans[i] = g.transform.GetChild(i);
+			}
 			StartCoroutine(SetValue());
 
-			if (IsServer || IsHost)
-				SetCansServerRpc(cansHeld = Random.Range(baseCans, 12));
-        }
+			if (base.IsServer)
+			{
+				mls.LogMessage("SetCans was called");
+				StartCoroutine(SendOutData());
+			}
+			else StartCoroutine(RequestData());
+		}
 
+		public IEnumerator SendOutData()
+        {
+			int cans = Mathf.Clamp(UnityEngine.Random.Range(1, 7) + UnityEngine.Random.Range(1, 7), minimumCans, 12);
+
+			canHandler.SendCansClientRpc(cans);
+			yield return new WaitForSeconds(2f);
+			canHandler.SendCansServerRpc(cans);
+		}
+
+		public IEnumerator RequestData()
+        {
+			yield return new WaitForSeconds(8f);
+			if(!loaded) canHandler.RequestCanDataServerRpc();
+        }
 
 		public IEnumerator SetValue()
         {
-			yield return new WaitForSeconds(1f);
-			value = scrapValue;
+			yield return new WaitForSeconds(3f);
 
+			value = UnityEngine.Random.Range(itemProperties.minValue, itemProperties.maxValue+1);
+
+			UpdateScrapValue();
+		}
+
+		public void UpdateScrapValue()
+        {
 			SetScrapValue(value + cansHeld * 10);
 		}
-
-		
-		[ServerRpc(RequireOwnership = true)]
-		public void SetCansServerRpc(int cans)
-        {
-			SetCansClientRpc(cans);
-
-		}
-		[ClientRpc]
-		public void SetCansClientRpc(int cans)
-		{
-			cansHeld = cans;
-			UpdateCans();
-		}
-
-
 
 		public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
-
+			mls.LogMessage("CansHeld: " + cansHeld);
             if (buttonDown && cansHeld > 0)
             {
                 cansHeld--;
                 UpdateCans();
-                SpawnCanServerRpc();
+				canHandler.SendCansServerRpc(cansHeld);
+				canHandler.SpawnCanServerRpc();
             }
         }
-
 
 		public void UpdateCans()
         {
 			if (value != 0)
-				SetScrapValue(value + cansHeld * 12);
+				UpdateScrapValue();
 
 			cansHeld = Mathf.Clamp(cansHeld, 0, cans.Length);
 			for(int i = 0; i < cans.Length; i++)
 			{
 				cans[i].gameObject.SetActive(i < cansHeld);
 			}
-			if (cansHeld == 0) itemUsedUp = true;
 		}
 
-
-		[ServerRpc(RequireOwnership = false)]
-		public void SpawnCanServerRpc()
-        {
-			#region Networking Stuff
-
-			Transform parent = ((((!(playerHeldBy != null) || !playerHeldBy.isInElevator) && !StartOfRound.Instance.inShipPhase) || !(RoundManager.Instance.spawnedScrapContainer != null)) ? StartOfRound.Instance.elevatorTransform : RoundManager.Instance.spawnedScrapContainer);
-			var vector = base.transform.position + Vector3.up * 0.25f;
-			var gameObject = UnityEngine.Object.Instantiate(canPrefab, vector, Quaternion.identity, parent);
-			GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
-			component.targetFloorPosition = component.GetItemFloorPosition(base.transform.position);
-			if (playerHeldBy != null && playerHeldBy.isInHangarShipRoom)
-			{
-				playerHeldBy.SetItemInElevator(droppedInShipRoom: true, droppedInElevator: true, component);
-			}
-			component.NetworkObject.Spawn();
-
-			#endregion
-
-            SpawnCanClientRpc(gameObject.GetComponent<NetworkObject>(), vector, cansHeld);
-		}
-
-		[ClientRpc]
-		public void SpawnCanClientRpc(NetworkObjectReference netObjectRef, Vector3 vector, int cans)
-        {
-			if (!base.IsServer)
-			{
-				cansHeld = cans;
-				UpdateCans();
-				StartCoroutine(waitForCanToSpawnOnClient(netObjectRef, vector));
-			}
-		}
-
-
-		private IEnumerator waitForCanToSpawnOnClient(NetworkObjectReference netObjectRef, Vector3 vector)
+		public IEnumerator waitForCanToSpawnOnClient(NetworkObjectReference netObjectRef, Vector3 vector)
 		{
             #region Networking Stuff
 
@@ -160,4 +137,68 @@ namespace LC_LethalEnergy
         }
     }
 
+
+	public class CanHandler : NetworkBehaviour
+    {
+		public DrinkCase drinkCase;
+
+		[ServerRpc(RequireOwnership = false)]
+		public void SendCansServerRpc(int cans)
+		{
+			SendCansClientRpc(cans);
+		}
+		[ClientRpc]
+		public void SendCansClientRpc(int cans)
+		{
+			drinkCase.mls.LogMessage("SetCans was called AND went through with " + cans + " cans");
+			drinkCase.cansHeld = cans;
+			drinkCase.UpdateCans();
+
+			drinkCase.loaded = true;
+		}
+
+
+		[ServerRpc(RequireOwnership = false)]
+		public void SpawnCanServerRpc()
+		{
+			#region Networking Stuff
+
+			Transform parent = (((!(drinkCase.playerHeldBy != null) || !drinkCase.playerHeldBy.isInElevator) && !StartOfRound.Instance.inShipPhase) || !(RoundManager.Instance.spawnedScrapContainer != null)) ? StartOfRound.Instance.elevatorTransform : RoundManager.Instance.spawnedScrapContainer;
+			var vector = base.transform.position + Vector3.up * 0.25f;
+			var gameObject = UnityEngine.Object.Instantiate(DrinkCase.canPrefab, vector, Quaternion.identity, parent);
+			GrabbableObject component = gameObject.GetComponent<GrabbableObject>();
+			component.targetFloorPosition = component.GetItemFloorPosition(base.transform.position);
+			if (drinkCase.playerHeldBy != null && drinkCase.playerHeldBy.isInHangarShipRoom)
+			{
+				drinkCase.playerHeldBy.SetItemInElevator(droppedInShipRoom: true, droppedInElevator: true, component);
+			}
+			component.NetworkObject.Spawn();
+
+			#endregion
+
+			SpawnCanClientRpc(gameObject.GetComponent<NetworkObject>(), vector.x, vector.y, vector.z, drinkCase.cansHeld);
+		}
+
+		[ClientRpc]
+		public void SpawnCanClientRpc(NetworkObjectReference netObjectRef, float x, float y, float z, int cans)
+		{
+			drinkCase.cansHeld = cans;
+			drinkCase.UpdateCans();
+			StartCoroutine(drinkCase.waitForCanToSpawnOnClient(netObjectRef, new Vector3(x,y,z)));
+		}
+
+
+
+		[ServerRpc(RequireOwnership = false)]
+		public void RequestCanDataServerRpc()
+        {
+			RequestCanDataClientRpc();
+		}
+
+		[ClientRpc]
+		public void RequestCanDataClientRpc()
+		{
+			if (IsServer) SendCansServerRpc(drinkCase.cansHeld);
+		}
+	}
 }

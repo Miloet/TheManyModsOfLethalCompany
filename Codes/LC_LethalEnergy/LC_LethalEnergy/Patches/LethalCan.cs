@@ -1,16 +1,14 @@
 ﻿using UnityEngine;
-using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using GameNetcodeStuff;
 using HarmonyLib;
+using System.Collections;
 using Unity.Netcode;
 
 namespace LC_LethalEnergy
 {
     public class LethalCan : GrabbableObject
     {
-
         public bool drinking;
 
         public float fill = 1f;
@@ -25,37 +23,58 @@ namespace LC_LethalEnergy
 
         public const string DrinkAnimation = "HoldMask";
 
-        public Item normalProp;
-        public Vector3 normalPos;
-        public Vector3 normalRot;
+        public static Item normalProp;
+        public static Item storeProp;
+        public static Vector3 normalPos;
+        public static Vector3 normalRot;
 
-        public Item drinkingProp;
-        public Vector3 drinkingPos;
-        public Vector3 drinkingRot;
+        public static Item drinkingProp;
+        public static Vector3 drinkingPos;
+        public static Vector3 drinkingRot;
 
         float animationLerp;
 
         private const int baseValue = 8;
-        private const int emptyValue = 1;
-
-
+        public const int emptyValue = 1;
 
         public static AudioClip drinkingSFX;
 
+        public FillHandler fillHandler;
+        public bool loaded = false;
+
+        public bool store = false;
+
         public override void Start()
         {
-            SetScrapValue(baseValue);
-            normalProp = itemProperties;
-            normalPos = normalProp.positionOffset;
-            normalRot = normalProp.rotationOffset;
-            drinkingPos = drinkingProp.positionOffset;
-            drinkingRot = drinkingProp.rotationOffset;
+            if(!store) SetScrapValue(baseValue);
+
+            if (normalProp == null)
+            {
+                if (!store) normalProp = itemProperties;
+
+                normalPos = itemProperties.positionOffset;
+                normalRot = itemProperties.rotationOffset;
+                drinkingPos = drinkingProp.positionOffset;
+                drinkingRot = drinkingProp.rotationOffset;
+            }
 
             base.Start();
+
+            fallTime = 1f;
+            hasHitGround = true;
+
             audio = GetComponent<AudioSource>();
 
-            FallToGround(true);
+            //FallToGround(true);
             //DrinkAnimation = itemProperties.useAnim;
+
+            if (!IsServer) StartCoroutine(RequestData());
+        }
+        public IEnumerator RequestData()
+        {
+            yield return new WaitForSeconds(5f);
+
+            if (!loaded) fillHandler.RequestFillDataServerRpc();
         }
 
         public override void ItemActivate(bool used, bool buttonDown = true)
@@ -87,16 +106,13 @@ namespace LC_LethalEnergy
             base.Update();
             if (isHeld && playerHeldBy == StartOfRound.Instance.localPlayerController)
             {
-                LethalEnergyMod.mls.LogMessage(animationLerp > 0f);
                 if (playerHeldBy.playerBodyAnimator.GetBool(DrinkAnimation)) animationLerp = Mathf.MoveTowards(animationLerp, 1f, Time.deltaTime * 3f / timeToStart);
                 else animationLerp = Mathf.MoveTowards(animationLerp, 0f, Time.deltaTime * 3f / timeToStart);
 
                 animationLerp = Mathf.Clamp01(animationLerp);
 
-                //LethalEnergyMod.mls.LogMessage(animationLerp);
-
-                if (animationLerp > 0f) ChangeItem(drinkingProp);
-                else ChangeItem(normalProp);
+                if (animationLerp > 0.1f) ChangeItem(drinkingProp);
+                else ChangeItem(!store ? normalProp : storeProp);
 
                 if (itemProperties == drinkingProp)
                 {
@@ -132,16 +148,28 @@ namespace LC_LethalEnergy
 
         private IEnumerator<WaitForSeconds> StartDrink()
         {
-            
-            ChangeItem(drinkingProp);
             yield return new WaitForSeconds(timeToStart);
             drinking = true;
-            audio.PlayOneShot(drinkingSFX);
+            audio.PlayOneShot(drinkingSFX, 0.75f);
 
             ////audio.PlayOneShot(twistCanSFX);
         }
 
+        public IEnumerator<WaitForSeconds> CrushCan()
+        {
+            Vector3 origin = Vector3.one;
+            Vector3 target = new Vector3(1, 0.3f, 1f);
+            float time = 0;
 
+            while (time < 1f)
+            {
+                transform.localScale = Vector3.Lerp(origin, target, time);
+
+                time += Time.deltaTime*4f;
+                yield return null;
+            }
+            originalScale = target;
+        }
 
         public override void EquipItem()
         {
@@ -159,7 +187,7 @@ namespace LC_LethalEnergy
                 StopCoroutine(DrinkCoroutine);
             }
             Stop();
-            SendFillServerRpc(fill);
+            fillHandler.SendFillServerRpc(fill);
             if (previousPlayerHeldBy != null)
             {
                 previousPlayerHeldBy.activatingItem = false;
@@ -168,23 +196,6 @@ namespace LC_LethalEnergy
             base.DiscardItem();
         }
 
-        [ServerRpc]
-        public void SendFillServerRpc(float fill)
-        {
-            SetFillClientRpc(fill);
-        }
-        [ClientRpc]
-        public void SetFillClientRpc(float Fill)
-        {
-            fill = Fill;
-            if (fill <= 0)
-            {
-                SetScrapValue(emptyValue);
-                itemUsedUp = true;
-            }
-        }
-
-
         public void Stop()
         {
             drinking = false;
@@ -192,6 +203,42 @@ namespace LC_LethalEnergy
             audio.Stop();
             playerHeldBy.playerBodyAnimator.ResetTrigger("shakeItem");
             previousPlayerHeldBy.playerBodyAnimator.SetBool(DrinkAnimation, false);
+        }
+    }
+
+
+    public class FillHandler : NetworkBehaviour
+    {
+        public LethalCan lethalCan;
+
+        [ServerRpc(RequireOwnership = false)]
+        public void SendFillServerRpc(float fill)
+        {
+            SendFillClientRpc(fill);
+        }
+        [ClientRpc]
+        public void SendFillClientRpc(float Fill)
+        {
+            lethalCan.loaded = true;
+            lethalCan.fill = Fill;
+            if (lethalCan.fill <= 0)
+            {
+                lethalCan.SetScrapValue(LethalCan.emptyValue);
+                lethalCan.itemUsedUp = true;
+                lethalCan.StartCoroutine(lethalCan.CrushCan());
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void RequestFillDataServerRpc()
+        {
+            RequestFillDataClientRpc();
+        }
+
+        [ClientRpc]
+        public void RequestFillDataClientRpc()
+        {
+            if (IsServer) SendFillServerRpc(lethalCan.fill);
         }
     }
 
@@ -210,7 +257,6 @@ namespace LC_LethalEnergy
 
         [HarmonyPatch(typeof(PlayerControllerB), "Start")]
         [HarmonyPostfix]
-
         public static void StartPatch(PlayerControllerB __instance)
         {
             BaseSpeed = __instance.movementSpeed;
@@ -218,16 +264,16 @@ namespace LC_LethalEnergy
             Duration = 0;
         }
 
+
         [HarmonyPatch(typeof(PlayerControllerB), "Update")]
         [HarmonyPostfix]
-
         public static void UpdatePatch(PlayerControllerB __instance)
         {
             if (__instance != StartOfRound.Instance.localPlayerController) return;
             __instance.movementSpeed = BaseSpeed + BaseSpeed * Caffeine * Boost;
             if (Caffeine > 0)
             {
-                __instance.moveInputVector = Quaternion.Euler(0, Mathf.Sin(Time.time) * Caffeine * 5f, 0) * __instance.moveInputVector;
+                //__instance.moveInputVector = Quaternion.Euler(0, Mathf.Sin(Time.time) * Caffeine * 5f, 0) * __instance.moveInputVector;
 
                 if (Duration > 0)
                 {
@@ -245,11 +291,25 @@ namespace LC_LethalEnergy
                 if (Caffeine > 4f && !kill)
                 {
                     kill= true;
-                    __instance.DamagePlayer(9999,true,true,CauseOfDeath.Crushing,1, false, default(Vector3));
+                    __instance.DamagePlayer(9999,true,true,CauseOfDeath.Crushing,1, false, Vector3.up);
                 }
 
 
                 Caffeine = Mathf.Clamp(Caffeine, 0, 5);
+            }
+        }
+
+
+        [HarmonyPatch(typeof(PlayerControllerB), "DamagePlayer")]
+        [HarmonyPostfix]
+        public static void ResetCaffine(PlayerControllerB __instance)
+        {
+            if(__instance.IsOwner && __instance.health <= 0)
+            {
+                warn = false;
+                kill = false;
+                Caffeine = 0;
+                Duration = 0;
             }
         }
 
@@ -262,6 +322,5 @@ namespace LC_LethalEnergy
             Caffeine = 0;
             Duration = 0;
         }
-
     }
 }
